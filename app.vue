@@ -1,8 +1,3 @@
 <template>
-  <AppContainer>
-    <AppHeader />
-    <PageContainer>
-      <NuxtPage />
-    </PageContainer>
-  </AppContainer>
+    <NuxtPage />
 </template>
