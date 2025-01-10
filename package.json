@@ -12,6 +12,7 @@
     "dependencies": {
         "@nuxtjs/supabase": "^1.4.5",
         "@nuxtjs/tailwindcss": "^6.12.2",
+        "@octokit/rest": "^21.1.0",
         "@vueuse/core": "^12.3.0",
         "@vueuse/nuxt": "^12.3.0",
         "nuxt": "^3.15.1",

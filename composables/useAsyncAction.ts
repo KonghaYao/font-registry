@@ -4,22 +4,28 @@ export interface AsyncState<Input, Output> {
     loading: boolean;
     refetch: (input: Input | null) => Promise<void>;
 }
+export interface AsyncEvent<Output> {
+    onError?: (err: Error) => void;
+    onSuccess?: (data: Output) => void;
+}
 export function useAsyncAction<Input, Output>(
-    fn: (input: Input) => Promise<Output>
+    fn: (input: Input) => Promise<Output>,
+    events?: AsyncEvent<Output>
 ) {
-    const refetch = async function (
-        this: AsyncState<Input, Output>,
-        input: Input
-    ) {
-        this.loading = true;
+    const refetch = async function (input: Input) {
+        /** @ts-ignore */
+        const that = this as AsyncState<Input, Output>;
+        that.loading = true;
 
         try {
             const response = await fn(input);
-            this.data = response;
+            that.data = response;
+            events?.onSuccess?.(response);
         } catch (err) {
-            this.error = err as Error;
+            that.error = err as Error;
+            events?.onError?.(err as Error);
         } finally {
-            this.loading = false;
+            that.loading = false;
         }
     };
     return reactive({
@@ -31,7 +37,12 @@ export function useAsyncAction<Input, Output>(
 }
 
 export function useAsyncJSON<Input, Output>(
-    fn: (input: Input) => { url: string; method?: "get" | "post"; body?: Input }
+    fn: (input: Input) => {
+        url: string;
+        method?: "get" | "post";
+        body?: Input;
+    },
+    events?: AsyncEvent<Output>
 ) {
     return useAsyncAction<Input, Output>(async (input) => {
         const data = fn(input);
@@ -49,5 +60,5 @@ export function useAsyncJSON<Input, Output>(
             server: false,
             lazy: true,
         });
-    });
+    }, events);
 }

@@ -2,11 +2,12 @@
 const client = useSupabaseClient()
 const user = useSupabaseUser()
 const imported = useImportFromGithub()
+const handleClick = () => imported.refetch({ name: 'lxgw', repo: 'kose-font' })
 </script>
 
 <template>
     <div>{{ user?.email }}</div>
-    <button @click="() => imported.refetch({ name: 'KonghaYao', repo: 'cn-font-split' })">
+    <button @click="handleClick">
 
         {{ imported.loading ? 1 : 0 }}
         {{ imported.data }}

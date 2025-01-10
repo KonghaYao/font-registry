@@ -8,6 +8,11 @@ export const useImportFromGithub = () => {
                 method: "post",
                 body: data,
             };
+        },
+        {
+            onSuccess: (data) => {
+                console.log(data);
+            },
         }
     );
 
