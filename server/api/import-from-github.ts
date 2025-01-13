@@ -8,6 +8,7 @@ export const schema = z.object({
     repo: z.string(),
 });
 
+/** 从 github 更新数据 */
 export default defineEventHandler(async (event) => {
     const user = await serverSupabaseUser(event);
     if (!user)
@@ -18,20 +19,61 @@ export default defineEventHandler(async (event) => {
     }
     const client = await serverSupabaseClient(event);
     // 查询有无该包
+    const userId = user.id;
+    const repo = await octokit.repos.get({
+        owner: params.data.name,
+        repo: params.data.repo,
+    });
+    const readme = await octokit.repos.getReadme({
+        owner: params.data.name,
+        repo: params.data.repo,
+    });
+    const pack = await client
+        .from("packages")
+        .upsert(
+            [
+                {
+                    name: repo.data.full_name,
+                    description: repo.data.description,
+                    homepage: repo.data.homepage || repo.data.html_url,
+                    keywords: repo.data.topics || [],
+                    readme: readme.data.content,
+                    latest: "",
+                    user_id: userId,
+                    from: "github_api",
+                },
+            ],
+            { onConflict: "name" }
+        )
+        .select();
+    if (pack.error) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: pack.error.message,
+        });
+    }
+    const pId = pack.data[0].id;
 
     const response = await octokit.repos.listReleases({
         owner: params.data.name,
         repo: params.data.repo,
     });
-    const githubReadMe = "";
+
     const key = params.data.name + "/" + params.data.repo;
-    const userId = user.id;
 
     // 注入版本表
-    const dataList = response.data.map(convertReleaseToPackage(key, userId));
+    const dataList = response.data.map(convertReleaseToPackage(pId, userId));
+
+    await client
+        .from("packages")
+        .update({
+            latest: response.data[0].tag_name,
+        })
+        .eq("id", pId)
+        .select();
     const { data, error } = await client
         .from("versions")
-        .insert(dataList as any)
+        .upsert(dataList as any, { onConflict: "package_id,version" })
         .select();
 
     if (error) {
@@ -50,7 +92,7 @@ export default defineEventHandler(async (event) => {
                 );
             })
             .map((asset) => ({
-                package_id: data[index].id,
+                version_id: data[index].id,
                 assets_name: asset.name,
                 size: asset.size,
                 download_url: asset.browser_download_url,
@@ -60,7 +102,9 @@ export default defineEventHandler(async (event) => {
     // 注入资源表
     const assetsInsert = await client
         .from("assets")
-        .insert(assets as any)
+        .upsert(assets as any, {
+            onConflict: "version_id,assets_name",
+        })
         .select();
 
     if (assetsInsert.error)
@@ -72,9 +116,9 @@ export default defineEventHandler(async (event) => {
     return {
         statusCode: 200,
         message: "success",
-        test: { response },
+        test: { response, repo },
         data: {
-            package: key,
+            package: pack.data[0],
             version: data,
             assets: assetsInsert.data,
         },
