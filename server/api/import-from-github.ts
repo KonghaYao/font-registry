@@ -1,8 +1,9 @@
 import { serverSupabaseUser } from "#supabase/server";
-import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
+import { octokit } from "./github-endpoint";
 import z from "zod";
 import { serverSupabaseClient } from "#supabase/server";
-const octokit = new Octokit({});
+import { RestEndpointMethodTypes } from "@octokit/rest";
+import { Database } from "~/types/database.types";
 export const schema = z.object({
     name: z.string(),
     repo: z.string(),
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
     if (!params.data) {
         throw createError({ statusCode: 400, statusMessage: "Bad Request" });
     }
-    const client = await serverSupabaseClient(event);
+    const client = await serverSupabaseClient<Database>(event);
     // 查询有无该包
     const userId = user.id;
     const repo = await octokit.repos.get({
@@ -58,8 +59,6 @@ export default defineEventHandler(async (event) => {
         owner: params.data.name,
         repo: params.data.repo,
     });
-
-    const key = params.data.name + "/" + params.data.repo;
 
     // 注入版本表
     const dataList = response.data.map(convertReleaseToPackage(pId, userId));
@@ -116,7 +115,7 @@ export default defineEventHandler(async (event) => {
     return {
         statusCode: 200,
         message: "success",
-        test: { response, repo },
+        // test: { response, repo },
         data: {
             package: pack.data[0],
             version: data,
@@ -125,7 +124,7 @@ export default defineEventHandler(async (event) => {
     };
 });
 const convertReleaseToPackage =
-    (packageId: string, userId: string) =>
+    (packageId: number, userId: string) =>
     (
         release: NonNullable<
             RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"]
