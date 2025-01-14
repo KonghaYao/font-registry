@@ -4,13 +4,13 @@ export interface AsyncState<Input, Output> {
     loading: boolean;
     refetch: (input: Input | null) => Promise<void>;
 }
-export interface AsyncEvent<Output> {
-    onError?: (err: Error) => void;
-    onSuccess?: (data: Output) => void;
+export interface AsyncEvent<Input, Output> {
+    onError?: (err: Error, input: Input) => void;
+    onSuccess?: (data: Output, input: Input) => void;
 }
 export function useAsyncAction<Input, Output>(
     fn: (input: Input) => Promise<Output>,
-    events?: AsyncEvent<Output>
+    events?: AsyncEvent<Input, Output>
 ) {
     const refetch = async function (input: Input) {
         /** @ts-ignore */
@@ -20,10 +20,10 @@ export function useAsyncAction<Input, Output>(
         try {
             const response = await fn(input);
             that.data = response;
-            events?.onSuccess?.(response);
+            events?.onSuccess?.(response, input);
         } catch (err) {
             that.error = err as Error;
-            events?.onError?.(err as Error);
+            events?.onError?.(err as Error, input);
         } finally {
             that.loading = false;
         }
@@ -32,7 +32,8 @@ export function useAsyncAction<Input, Output>(
         data: null as Output | null,
         error: null as Error | null,
         loading: false,
-        refetch: refetch,
+        refetch,
+        fetch: refetch,
     });
 }
 
@@ -42,7 +43,7 @@ export function useAsyncJSON<Input, Output>(
         method?: "get" | "post";
         body?: Input;
     },
-    events?: AsyncEvent<Output>
+    events?: AsyncEvent<Input, Output>
 ) {
     return useAsyncAction<Input, Output>(async (input) => {
         const data = fn(input);

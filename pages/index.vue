@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const client = useSupabaseClient()
 const user = useSupabaseUser()
 const imported = useImportFromGithub()
-const handleClick = () => imported.refetch({ name: 'lxgw', repo: 'kose-font' })
+const handleClick = () => imported.fetch({ name: 'lxgw', repo: 'kose-font' })
 </script>
 
 <template>

@@ -10,8 +10,14 @@ export const useImportFromGithub = () => {
             };
         },
         {
-            onSuccess: (data) => {
-                console.log(data);
+            onSuccess: (data, input) => {
+                ElMessage.success(`${input.name}/${input.repo} 导入成功`);
+            },
+            onError(err, input) {
+                console.error(err);
+                ElMessage.error(
+                    `${err.message} ${input.name}/${input.repo} 导入失败`
+                );
             },
         }
     );
