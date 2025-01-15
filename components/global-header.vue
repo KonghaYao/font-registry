@@ -7,6 +7,10 @@ const links = [
         name: "Home",
         to: "/",
     },
+    {
+        name: "字体",
+        to: "/packages",
+    },
 ];
 
 const userDropdowns = computed(() => [
@@ -34,38 +38,18 @@ const userDropdowns = computed(() => [
 
 <template>
     <header>
-        <nav
-            class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b"
-        >
-            <div
-                class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl"
-            >
+        <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b">
+            <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                 <NuxtLink to="/" class="flex items-center">
-                    <span
-                        class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
-                        >FRP</span
-                    >
+                    <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">FRP</span>
                 </NuxtLink>
                 <div class="flex items-center lg:order-2">
-                    <UDropdown
-                        :items="userDropdowns"
-                        :popper="{ placement: 'bottom-start' }"
-                    >
-                        <UAvatar
-                            :src="
-                                'https://cn.cravatar.com/avatar/' +
-                                md5(user?.email) +
-                                's=64'
-                            "
-                        ></UAvatar>
+                    <UDropdown :items="userDropdowns" :popper="{ placement: 'bottom-start' }">
+                        <UAvatar :src="'https://cn.cravatar.com/avatar/' + md5(user?.email || '') + 's=64'"></UAvatar>
                     </UDropdown>
                 </div>
-                <div
-                    class="justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
-                >
-                    <ul
-                        class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0"
-                    >
+                <div class="justify-between items-center w-full lg:flex lg:w-auto lg:order-1">
+                    <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                         <li v-for="link in links">
                             <NuxtLink
                                 :to="link.to"

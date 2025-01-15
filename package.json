@@ -28,6 +28,7 @@
     },
     "devDependencies": {
         "@element-plus/nuxt": "^1.1.1",
+        "@types/md5": "^2.3.5",
         "element-plus": "^2.9.3"
     }
 }

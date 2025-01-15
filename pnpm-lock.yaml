@@ -54,6 +54,9 @@ importers:
       '@element-plus/nuxt':
         specifier: ^1.1.1
         version: 1.1.1(@element-plus/icons-vue@2.3.1(vue@3.5.13(typescript@5.7.2)))(element-plus@2.9.3(vue@3.5.13(typescript@5.7.2)))(magicast@0.3.5)(rollup@4.30.1)
+      '@types/md5':
+        specifier: ^2.3.5
+        version: 2.3.5
       element-plus:
         specifier: ^2.9.3
         version: 2.9.3(vue@3.5.13(typescript@5.7.2))
@@ -1172,6 +1175,9 @@ packages:
 
   '@types/lodash@4.17.14':
     resolution: {integrity: sha512-jsxagdikDiDBeIRaPYtArcT8my4tN1og7MtMRquFT3XNA6axxyHDRUemqDz/taRDdOUn0GnGHRCuff4q48sW9A==}
+
+  '@types/md5@2.3.5':
+    resolution: {integrity: sha512-/i42wjYNgE6wf0j2bcTX6kuowmdL/6PE4IVitMpm2eYKBUuYCprdcWVK+xEF0gcV6ufMCRhtxmReGfc6hIK7Jw==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -5750,6 +5756,8 @@ snapshots:
       '@types/lodash': 4.17.14
 
   '@types/lodash@4.17.14': {}
+
+  '@types/md5@2.3.5': {}
 
   '@types/mdast@4.0.4':
     dependencies:

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { type Database } from "~/types/database.types";
 
+definePageMeta({
+    layout: "packages",
+});
+
+
 const client = useSupabaseClient<Database>();
 const PackagesData = useAsyncAction(async () =>
     client
@@ -22,7 +27,7 @@ onMounted(() => {
             <header class="flex justify-between items-baseline">
                 <NuxtLink
                     :to="`/packages/${pack.name}`"
-                    class="text-3xl font-bold leading-tight text-gray-900 flex items-center mb-4"
+                    class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4"
                 >
                     <span class="pr-4">{{ pack.name }}</span>
                 </NuxtLink>
@@ -36,7 +41,7 @@ onMounted(() => {
                     </NuxtLink>
                 </div>
             </header>
-            <div class="prose prose-lg text-gray-600 mb-6">
+            <div class="text-gray-600 mb-6">
                 {{ pack.description }}
             </div>
             <footer class="flex -m-2 justify-between">
