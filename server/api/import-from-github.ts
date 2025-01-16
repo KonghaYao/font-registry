@@ -29,7 +29,6 @@ export default defineEventHandler(async (event) => {
         owner: params.data.name,
         repo: params.data.repo,
     });
-    console.log(readme);
     const pack = await client
         .from("packages")
         .upsert(
