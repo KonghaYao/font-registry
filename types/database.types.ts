@@ -58,6 +58,7 @@ export type Database = {
           latest: string
           name: string
           readme: string | null
+          style: Json | null
           user_id: string
         }
         Insert: {
@@ -70,6 +71,7 @@ export type Database = {
           latest: string
           name: string
           readme?: string | null
+          style?: Json | null
           user_id: string
         }
         Update: {
@@ -82,6 +84,7 @@ export type Database = {
           latest?: string
           name?: string
           readme?: string | null
+          style?: Json | null
           user_id?: string
         }
         Relationships: []

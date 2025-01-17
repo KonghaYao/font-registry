@@ -7,6 +7,7 @@ export const schema = z.object({
     repo: z.string(),
 });
 
+// 预构建字体，保证可以获取到
 export default defineEventHandler(async (event) => {
     const body = await readValidatedBody(event, schema.safeParse);
     if (!body.data) {
@@ -14,12 +15,13 @@ export default defineEventHandler(async (event) => {
     }
     const client = serverSupabaseServiceRole<Database>(event);
     const key = `${body.data.name}/${body.data.repo}`;
-    const pkg = await client.from("packages").select("*").eq("name", key).single();
+    const pkg = await client.from("packages").select("id,latest,style,name").eq("name", key).single();
     if (!pkg.data) {
         throw new Error("Package not found");
     }
 
     const style = pkg.data.style;
+    // @ts-ignore
     if (!style || style.version !== pkg.data.latest) {
         const version = await client
             .from("versions")
@@ -50,24 +52,19 @@ export default defineEventHandler(async (event) => {
             .then((res) => {
                 console.log(res);
             });
-        await new Promise((res) => {
-            setTimeout(() => {
-                res(null);
-            }, 1000);
-        });
         console.log("构建完成", file_folder);
         const bin = await fetch("https://ik.imagekit.io/cnfont" + file_folder + "reporter.bin").then((res) =>
             res.arrayBuffer()
         );
-        console.log(bin.byteLength);
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
             version: pkg.data.latest,
             file_name: asset.assets_name,
             file_folder,
-            ...reporter.css,
+            ...reporter.css.toObject(),
         };
-        await client.from("packages").update({ style }).eq("name", key).select();
+        const { error } = await client.from("packages").update({ style }).eq("id", pkg.data.id).select();
+        if (error) throw new Error(error.message);
         return style;
     }
     return style;
