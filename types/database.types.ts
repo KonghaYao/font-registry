@@ -15,6 +15,7 @@ export type Database = {
           created_at: string
           download_url: string
           id: number
+          is_published: boolean
           size: number
           user_id: string | null
           version_id: number
@@ -24,6 +25,7 @@ export type Database = {
           created_at?: string
           download_url: string
           id?: number
+          is_published?: boolean
           size?: number
           user_id?: string | null
           version_id: number
@@ -33,6 +35,7 @@ export type Database = {
           created_at?: string
           download_url?: string
           id?: number
+          is_published?: boolean
           size?: number
           user_id?: string | null
           version_id?: number

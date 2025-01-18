@@ -37,7 +37,15 @@ export default defineEventHandler(async (event) => {
         if (!asset) {
             throw new Error("Asset not found");
         }
-        const file_folder = ("/packages/" + key + "/" + asset.assets_name + "/").replaceAll(".", "_");
+        const file_folder = (
+            "/packages/" +
+            key +
+            "/" +
+            version.data.version +
+            "/" +
+            asset.assets_name +
+            "/"
+        ).replaceAll(".", "_");
         await fetch("https://cn-font-5hrt.shuttle.app/upload", {
             method: "POST",
             headers: {
@@ -64,7 +72,9 @@ export default defineEventHandler(async (event) => {
             ...reporter.css.toObject(),
         };
         const { error } = await client.from("packages").update({ style }).eq("id", pkg.data.id).select();
-        if (error) throw new Error(error.message);
+        if (error) throw error;
+        const restoreAsset = await client.from("assets").update({ is_published: true }).eq("id", asset.id).select();
+        if (restoreAsset.error) throw restoreAsset.error;
         return style;
     }
     return style;

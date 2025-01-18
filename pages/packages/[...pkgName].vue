@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { type Database } from "../../types/database.types";
 import "github-markdown-css/github-markdown.css";
-import prettyBytes from "pretty-bytes";
-
+import { createFontLink } from "~/composables/useFont";
 definePageMeta({
     layout: "packages",
 });
@@ -14,19 +13,9 @@ const pkgKey = pkgName.join("/");
 const client = useSupabaseClient<Database>();
 const pkgDetail = useAsyncData(async () => {
     const data = await client.from("packages").select("*").eq("name", pkgKey).single();
-    return { data };
+    return data.data;
 });
-const allVersions = useAsyncAction(
-    async () => {
-        const id = pkgDetail.data.value?.data?.id!;
-        return client.from("versions").select("*, assets!inner(*)").eq("package_id", id);
-    },
-    {
-        onSuccess(data) {
-            console.log(data);
-        },
-    }
-);
+
 function base64ToUtf8(base64String: string) {
     if (typeof Buffer === "function") {
         // Node.js 环境
@@ -51,59 +40,51 @@ const items = [
         label: "版本",
     },
 ];
-function onChange(index: number) {
-    const item = items[index];
-
-    item.label === "版本" && !allVersions.data && allVersions.fetch(null);
-}
+const fontInfoOfStyle = computed(() => {
+    return (pkgDetail.data.value?.style || {}) as {
+        family: string;
+        weight: string;
+        file_name: string;
+    };
+});
 </script>
 <template>
-    <div class="min-w-48 max-w-[980px] mx-auto p-12">
+    <div
+        class="min-w-48 max-w-[980px] mx-auto p-12"
+        :style="{
+            fontFamily: `'${fontInfoOfStyle.family}'`,
+            fontWeight: fontInfoOfStyle.weight,
+        }"
+    >
+        <link
+            v-if="pkgDetail.data.value?.name && fontInfoOfStyle?.file_name"
+            rel="stylesheet"
+            :href="createFontLink(pkgDetail.data.value?.name, pkgDetail.data.value?.latest, fontInfoOfStyle?.file_name)"
+        />
         <div class="my-6 p-8 bg-blue-50">
             <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
-                {{ pkgDetail.data.value?.data?.name }}
+                {{ pkgDetail.data.value?.name }}
             </div>
             <div>
-                {{ pkgDetail.data.value?.data?.description }}
+                {{ pkgDetail.data.value?.description }}
             </div>
+            <div>最新版本： {{ pkgDetail.data.value?.latest }}</div>
         </div>
-        <div class="my-6 p-8 bg-blue-50">最新版本： {{ pkgDetail.data.value?.data?.latest }}</div>
 
-        <UTabs :items="items" :default-index="0" @change="onChange">
+        <UTabs :items="items" :default-index="0">
             <template #item="{ item }">
                 <MDC
                     v-if="item.label === 'Readme'"
                     class="markdown-body mt-4"
-                    :value="base64ToUtf8(pkgDetail.data.value?.data?.readme || '')"
+                    :value="base64ToUtf8(pkgDetail.data.value?.readme || '')"
                     tag="article"
                 />
-                <div v-if="item.label === '版本'">
-                    <ul class="flex flex-col gap-4">
-                        <li v-for="(item, index) in allVersions.data?.data" class="border-b border-gray-300 py-4">
-                            <div class="text-3xl font-bold leading-tight text-gray-900 flex items-center">
-                                {{ item.version }}
-                            </div>
-
-                            <MDC class="markdown-body py-4" :value="item.description || ''" tag="div" />
-                            <ul>
-                                <li v-for="(asset, index) in item.assets" class="flex justify-between">
-                                    <NuxtLink :to="asset.download_url" class="text-primary-500">
-                                        <UIcon name="material-symbols:download-for-offline-rounded" class="w-5 h-5" />
-                                        {{ asset.assets_name }}
-                                    </NuxtLink>
-                                    <span class="text-gray-500">
-                                        {{ prettyBytes(asset.size) }}
-                                        {{ " " }}
-                                        {{ new Date(item.created_at).toLocaleString() }}
-                                    </span>
-                                </li>
-                            </ul>
-                            <div class="text-gray-500">
-                                {{ new Date(item.created_at).toLocaleString() }}
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+                <version-panel
+                    v-if="item.label === '版本'"
+                    :pkg-id="pkgDetail.data.value?.id!"
+                    :pkg-name="pkgDetail.data.value?.name!"
+                >
+                </version-panel>
             </template>
         </UTabs>
     </div>
