@@ -17,6 +17,7 @@ export type Database = {
           id: number
           is_published: boolean
           size: number
+          style: Json | null
           user_id: string | null
           version_id: number
         }
@@ -27,6 +28,7 @@ export type Database = {
           id?: number
           is_published?: boolean
           size?: number
+          style?: Json | null
           user_id?: string | null
           version_id: number
         }
@@ -37,6 +39,7 @@ export type Database = {
           id?: number
           is_published?: boolean
           size?: number
+          style?: Json | null
           user_id?: string | null
           version_id?: number
         }

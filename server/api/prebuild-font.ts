@@ -1,10 +1,9 @@
-import { serverSupabaseServiceRole, serverSupabaseUser } from "#supabase/server";
+import { serverSupabaseServiceRole } from "#supabase/server";
 import z from "zod";
 import { Database } from "~/types/database.types";
 import { decodeReporter } from "cn-font-split/dist/createAPI";
 export const schema = z.object({
     name: z.string(),
-    repo: z.string(),
 });
 
 // 预构建字体，保证可以获取到
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event) => {
         throw new Error("Invalid body");
     }
     const client = serverSupabaseServiceRole<Database>(event);
-    const key = `${body.data.name}/${body.data.repo}`;
+    const key = body.data.name;
     const pkg = await client.from("packages").select("id,latest,style,name").eq("name", key).single();
     if (!pkg.data) {
         throw new Error("Package not found");
@@ -61,19 +60,23 @@ export default defineEventHandler(async (event) => {
                 console.log(res);
             });
         console.log("构建完成", file_folder);
-        const bin = await fetch("https://ik.imagekit.io/cnfont" + file_folder + "reporter.bin").then((res) =>
+        const bin = await fetch("https://ik.imagekit.io/cnfont2" + file_folder + "reporter.bin").then((res) =>
             res.arrayBuffer()
         );
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
-            version: pkg.data.latest,
+            version: version.data.version,
             file_name: asset.assets_name,
             file_folder,
             ...reporter.css.toObject(),
         };
         const { error } = await client.from("packages").update({ style }).eq("id", pkg.data.id).select();
         if (error) throw error;
-        const restoreAsset = await client.from("assets").update({ is_published: true }).eq("id", asset.id).select();
+        const restoreAsset = await client
+            .from("assets")
+            .update({ is_published: true, style })
+            .eq("id", asset.id)
+            .select();
         if (restoreAsset.error) throw restoreAsset.error;
         return style;
     }
