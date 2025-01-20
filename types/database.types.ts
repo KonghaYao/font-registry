@@ -53,8 +53,39 @@ export type Database = {
           },
         ]
       }
+      authors: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          id: number
+          is_user: string | null
+          link: string | null
+          name: string
+          name_cn: string | null
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          id?: number
+          is_user?: string | null
+          link?: string | null
+          name: string
+          name_cn?: string | null
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          id?: number
+          is_user?: string | null
+          link?: string | null
+          name?: string
+          name_cn?: string | null
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
+          author: number
           created_at: string
           description: string | null
           from: string | null
@@ -62,12 +93,15 @@ export type Database = {
           id: number
           keywords: string[]
           latest: string
+          license: string | null
           name: string
+          name_cn: string | null
           readme: string | null
           style: Json | null
           user_id: string
         }
         Insert: {
+          author: number
           created_at?: string
           description?: string | null
           from?: string | null
@@ -75,12 +109,15 @@ export type Database = {
           id?: number
           keywords: string[]
           latest: string
+          license?: string | null
           name: string
+          name_cn?: string | null
           readme?: string | null
           style?: Json | null
           user_id: string
         }
         Update: {
+          author?: number
           created_at?: string
           description?: string | null
           from?: string | null
@@ -88,12 +125,22 @@ export type Database = {
           id?: number
           keywords?: string[]
           latest?: string
+          license?: string | null
           name?: string
+          name_cn?: string | null
           readme?: string | null
           style?: Json | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "packages_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       versions: {
         Row: {

@@ -53,7 +53,9 @@ export default defineCompose(validateJSON(schema), async (event) => {
             console.log(res);
         });
     console.log("构建完成", file_folder);
-    const bin = await fetch(process.env.ASSETS_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
+    const bin = await fetch(process.env.SPLIT_SERVER + "/assets" + file_folder + "reporter.bin").then((res) =>
+        res.arrayBuffer()
+    );
     const reporter = decodeReporter(new Uint8Array(bin));
     console.log("接入完成");
     const style = {

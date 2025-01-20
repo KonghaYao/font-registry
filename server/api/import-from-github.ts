@@ -1,6 +1,6 @@
 import { octokit } from "../utils/github-endpoint";
 import z from "zod";
-import { serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient, serverSupabaseServiceRole } from "#supabase/server";
 import { RestEndpointMethodTypes } from "@octokit/rest";
 import { Database } from "~/types/database.types";
 import { defineCompose } from "../utils/compose";
@@ -16,9 +16,37 @@ export const schema = z.object({
 export default defineCompose(authRunner, validateJSON(schema), async (event) => {
     const user = useUser(event)!;
     const params: z.infer<typeof schema> = useJSON(event);
-    const client = await serverSupabaseClient<Database>(event);
+    const client = serverSupabaseServiceRole<Database>(event);
     // 查询有无该包
     const userId = user.id;
+
+    const githubUser = await octokit.users.getByUsername({ username: params.name });
+    if (!githubUser.data.name)
+        return createError({
+            statusCode: 400,
+            statusMessage: "用户名不存在",
+        });
+
+    const author = await client
+        .from("authors")
+        .upsert(
+            [
+                {
+                    name: params.name,
+                    name_cn: githubUser.data.name,
+                    avatar: githubUser.data.avatar_url,
+                    link: githubUser.data.html_url,
+                },
+            ],
+            { onConflict: "name" }
+        )
+        .select();
+    if (author.error) {
+        return createError({
+            statusCode: 400,
+            statusMessage: author.error.message,
+        });
+    }
     const repo = await octokit.repos.get({
         owner: params.name,
         repo: params.repo,
@@ -43,6 +71,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
                     license: repo.data.license?.name,
                     user_id: userId,
                     from: "github_api",
+                    author: author.data[0].id,
                 },
             ],
             { onConflict: "name" }
@@ -84,8 +113,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         let assetIds = release.assets.filter((i) => {
             return (
                 i.state === "uploaded" &&
-                (i.content_type.startsWith("font/") ||
-                    ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
+                (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
             );
         });
         return assetIds.map((asset) => ({

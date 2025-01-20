@@ -5,12 +5,11 @@ definePageMeta({
     layout: "packages",
 });
 
-
 const client = useSupabaseClient<Database>();
 const PackagesData = useAsyncAction(async () =>
     client
         .from("packages")
-        .select("name,latest,keywords,created_at,homepage,description")
+        .select("name,latest,keywords,created_at,homepage,description,license,author!inner(*)")
         .order("created_at", { ascending: false })
 );
 onMounted(() => {
@@ -20,10 +19,7 @@ onMounted(() => {
 
 <template>
     <ul v-if="PackagesData.data" class="flex flex-col gap-8">
-        <li
-            class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-            v-for="pack in PackagesData.data.data"
-        >
+        <li class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12" v-for="pack in PackagesData.data.data">
             <header class="flex justify-between items-baseline">
                 <NuxtLink
                     :to="`/packages/${pack.name}`"
@@ -34,17 +30,14 @@ onMounted(() => {
                 <b class="text-xl text-gray-700">{{ pack.latest }}</b>
                 <div class="flex-1 flex justify-end">
                     <NuxtLink v-if="pack.homepage" :to="pack.homepage">
-                        <UIcon
-                            name="icon-park-outline:link"
-                            class="w-5 h-5 text-primary-500"
-                        />
+                        <UIcon name="icon-park-outline:link" class="w-5 h-5 text-primary-500" />
                     </NuxtLink>
                 </div>
             </header>
             <div class="text-gray-600 mb-6">
                 {{ pack.description }}
             </div>
-            <footer class="flex -m-2 justify-between">
+            <footer class="flex-col -m-2 justify-between">
                 <div class="p-2 w-full md:w-1/2 lg:w-1/3">
                     <ul class="flex gap-2">
                         <li
@@ -56,7 +49,17 @@ onMounted(() => {
                         </li>
                     </ul>
                 </div>
-                <div class="p-2 text-sm text-gray-500">
+                <div class="p-2 text-sm text-gray-500 flex gap-4">
+                    <a :href="pack.author?.link||''" class="flex gap-2">
+                        <img v-if="pack.author?.avatar" class="w-5 h-5 rounded-full overflow-hidden object-fit" :src="pack.author?.avatar" alt="avatar"> </img>
+                        {{ pack.author?.name }}
+                    </a>
+                    <div>
+                        {{ pack.latest }}
+                    </div>
+                    <div>
+                        {{ pack.license }}
+                    </div>
                     <time datetime="{{ pack.created_at }}">
                         {{ new Date(pack.created_at).toLocaleString() }}
                     </time>

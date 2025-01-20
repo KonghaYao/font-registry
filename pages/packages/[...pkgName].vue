@@ -12,6 +12,7 @@ const pkgName = route.params.pkgName as string[];
 const pkgKey = pkgName.join("/");
 const client = useSupabaseClient<Database>();
 const pkgDetail = useAsyncData(async () => {
+    if (!pkgKey) throw new Error("pkgKey is empty");
     const data = await client.from("packages").select("*").eq("name", pkgKey).single();
     return data.data;
 });
