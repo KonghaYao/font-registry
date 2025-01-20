@@ -1,33 +1,30 @@
-import { serverSupabaseUser } from "#supabase/server";
-import { octokit } from "./github-endpoint";
+import { octokit } from "../utils/github-endpoint";
 import z from "zod";
 import { serverSupabaseClient } from "#supabase/server";
 import { RestEndpointMethodTypes } from "@octokit/rest";
 import { Database } from "~/types/database.types";
+import { defineCompose } from "../utils/compose";
+import { authRunner, useUser } from "../utils/auth";
+import { useJSON, validateJSON } from "../utils/validation";
 export const schema = z.object({
     name: z.string(),
     repo: z.string(),
 });
 
 /** 从 github 更新数据 */
-export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event);
-    if (!user)
-        throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-    const params = await readValidatedBody(event, schema.safeParse);
-    if (!params.data) {
-        throw createError({ statusCode: 400, statusMessage: "Bad Request" });
-    }
+export default defineCompose(authRunner, validateJSON(schema), async (event) => {
+    const user = useUser(event)!;
+    const params: z.infer<typeof schema> = useJSON(event);
     const client = await serverSupabaseClient<Database>(event);
     // 查询有无该包
     const userId = user.id;
     const repo = await octokit.repos.get({
-        owner: params.data.name,
-        repo: params.data.repo,
+        owner: params.name,
+        repo: params.repo,
     });
     const readme = await octokit.repos.getReadme({
-        owner: params.data.name,
-        repo: params.data.repo,
+        owner: params.name,
+        repo: params.repo,
     });
     const pack = await client
         .from("packages")
@@ -48,7 +45,7 @@ export default defineEventHandler(async (event) => {
         )
         .select();
     if (pack.error) {
-        throw createError({
+        return createError({
             statusCode: 400,
             statusMessage: pack.error.message,
         });
@@ -56,8 +53,8 @@ export default defineEventHandler(async (event) => {
     const pId = pack.data[0].id;
 
     const response = await octokit.repos.listReleases({
-        owner: params.data.name,
-        repo: params.data.repo,
+        owner: params.name,
+        repo: params.repo,
     });
 
     // 注入版本表
@@ -76,7 +73,7 @@ export default defineEventHandler(async (event) => {
         .select();
 
     if (error) {
-        throw createError({ statusCode: 400, statusMessage: error.message });
+        return createError({ statusCode: 400, statusMessage: error.message });
     }
 
     const assets = response.data.flatMap((release, index) =>
@@ -84,10 +81,7 @@ export default defineEventHandler(async (event) => {
             .filter((i) => {
                 return (
                     i.state === "uploaded" &&
-                    (i.content_type.startsWith("font/") ||
-                        ["otf", "ttf", "woff2"].some((ext) =>
-                            i.name.endsWith(ext)
-                        ))
+                    (i.content_type.startsWith("font/") || ["otf", "ttf", "woff2"].some((ext) => i.name.endsWith(ext)))
                 );
             })
             .map((asset) => ({
@@ -107,7 +101,7 @@ export default defineEventHandler(async (event) => {
         .select();
 
     if (assetsInsert.error)
-        throw createError({
+        return createError({
             statusCode: 400,
             statusMessage: assetsInsert.error.message,
         });
@@ -123,13 +117,12 @@ export default defineEventHandler(async (event) => {
         },
     };
 });
+
+
+
 const convertReleaseToPackage =
     (packageId: number, userId: string) =>
-    (
-        release: NonNullable<
-            RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"]
-        >[number]
-    ) => {
+    (release: NonNullable<RestEndpointMethodTypes["repos"]["listReleases"]["response"]["data"]>[number]) => {
         // 默认值设置
         return {
             created_at: release.published_at, // 转换为 Date 对象

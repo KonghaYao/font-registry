@@ -2,24 +2,20 @@ import { serverSupabaseServiceRole, serverSupabaseUser } from "#supabase/server"
 import z from "zod";
 import { Database } from "~/types/database.types";
 import { decodeReporter } from "cn-font-split/dist/createAPI";
+import { defineCompose } from "../utils/compose";
+import { authRunner, useUser } from "../utils/auth";
+import { useJSON, validateJSON } from "../utils/validation";
 export const schema = z.object({
     name: z.string(),
 });
 
-// 预构建字体，保证可以获取到
-export default defineEventHandler(async (event) => {
-    const user = await serverSupabaseUser(event);
-    if (!user)
-        return createError({ statusCode: 401, statusMessage: "Unauthorized" });
-    const body = await readValidatedBody(event, schema.safeParse);
-    if (!body.data) {
-        throw new Error("Invalid body");
-    }
+export default defineCompose(authRunner, validateJSON(schema), async (event) => {
+    const body: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole<Database>(event);
-    const key = body.data.name;
+    const key = body.name;
     const pkg = await client.from("packages").select("id,latest,style,name").eq("name", key).single();
     if (!pkg.data) {
-        throw new Error("Package not found");
+        return createError("Package not found");
     }
 
     const style = pkg.data.style;
@@ -32,12 +28,12 @@ export default defineEventHandler(async (event) => {
             .eq("version", pkg.data.latest)
             .single();
         if (!version.data) {
-            throw new Error("Version not found");
+            return createError("Version not found");
         }
         const assets = await client.from("assets").select("*").eq("version_id", version.data.id).select();
         const asset = assets.data?.[0];
         if (!asset) {
-            throw new Error("Asset not found");
+            return createError("Asset not found");
         }
         const file_folder = (
             "/packages/" +
