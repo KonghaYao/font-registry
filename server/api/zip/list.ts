@@ -9,7 +9,7 @@ export const schema = z.object({
 
 export default defineCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
-    const zip = new ZIPPath(params.url);
+    const zip = new ZIPPath(decodeURIComponent(params.url));
     await zip.cacheFetch();
     return zip.getPaths();
 });
