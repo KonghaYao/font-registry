@@ -6,6 +6,7 @@ export interface ComposeEventHandler<
 > {
     (event: H3Event<Request>): Response;
 }
+/** 简单实现 compose，并不需要 next 函数来支持 */
 export const defineCompose = <T extends EventHandlerRequest, D>(...args: ComposeEventHandler<T, D>[]) => {
     return defineEventHandler<T>(async (event) => {
         for (const handler of args) {

@@ -14,9 +14,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
     const client = serverSupabaseServiceRole<Database>(event);
     const key = body.name;
     const pkg = await client.from("packages").select("id,latest,style,name").eq("name", key).single();
-    if (!pkg.data) {
-        return createError("Package not found");
-    }
+    if (!pkg.data) return createError("Package not found");
 
     const style = pkg.data.style;
     // @ts-ignore
@@ -27,14 +25,12 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             .eq("package_id", pkg.data.id)
             .eq("version", pkg.data.latest)
             .single();
-        if (!version.data) {
-            return createError("Version not found");
-        }
+        if (!version.data) return createError("Version not found");
+
         const assets = await client.from("assets").select("*").eq("version_id", version.data.id).select();
         const asset = assets.data?.[0];
-        if (!asset) {
-            return createError("Asset not found");
-        }
+        if (!asset) return createError("Asset not found");
+
         const file_folder = (
             "/packages/" +
             key +

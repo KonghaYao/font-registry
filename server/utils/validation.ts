@@ -10,7 +10,7 @@ export const validateJSON =
         if (!body.data) {
             return createError({
                 statusCode: 400,
-                statusMessage: "Imvalid body",
+                statusMessage: "Invalid body",
             });
         }
         event.context.json = body.data!;

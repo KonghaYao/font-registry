@@ -3,7 +3,6 @@ import z from "zod";
 import { Database } from "~/types/database.types";
 import { decodeReporter } from "cn-font-split/dist/createAPI";
 import { defineCompose } from "../utils/compose";
-import { authRunner } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
 export const schema = z.object({
     name: z.string(),
