@@ -18,8 +18,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <ul v-if="PackagesData.data" class="flex flex-col gap-8">
-        <li class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12" v-for="pack in PackagesData.data.data">
+    <ul v-if="PackagesData.data" class="flex flex-col gap-8 py-8 max-w-4xl mx-auto">
+        <u-card class="w-full" v-for="pack in PackagesData.data.data">
             <header class="flex justify-between items-baseline">
                 <NuxtLink
                     :to="`/packages/${pack.name}`"
@@ -65,6 +65,6 @@ onMounted(() => {
                     </time>
                 </div>
             </footer>
-        </li>
+        </u-card>
     </ul>
 </template>

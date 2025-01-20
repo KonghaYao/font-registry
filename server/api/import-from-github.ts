@@ -20,22 +20,19 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
     // 查询有无该包
     const userId = user.id;
 
-    const githubUser = await octokit.users.getByUsername({ username: params.name });
-    if (!githubUser.data.name)
-        return createError({
-            statusCode: 400,
-            statusMessage: "用户名不存在",
-        });
-
+    const repo = await octokit.repos.get({
+        owner: params.name,
+        repo: params.repo,
+    });
     const author = await client
         .from("authors")
         .upsert(
             [
                 {
-                    name: params.name,
-                    name_cn: githubUser.data.name,
-                    avatar: githubUser.data.avatar_url,
-                    link: githubUser.data.html_url,
+                    name: repo.data.owner.login,
+                    name_cn: repo.data.owner.login || repo.data.owner.name,
+                    avatar: repo.data.owner.avatar_url,
+                    link: repo.data.owner.html_url,
                 },
             ],
             { onConflict: "name" }
@@ -47,10 +44,6 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             statusMessage: author.error.message,
         });
     }
-    const repo = await octokit.repos.get({
-        owner: params.name,
-        repo: params.repo,
-    });
     const readme = await octokit.repos.getReadme({
         owner: params.name,
         repo: params.repo,
