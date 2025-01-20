@@ -8,8 +8,7 @@ const props = defineProps<{
 const client = useSupabaseClient<Database>();
 const allVersions = useAsyncAction(
     async () => {
-        const id = props.pkgId!;
-        return client.from("versions").select("*, assets!inner(*)").eq("package_id", id);
+        return client.from("versions").select("*, assets!inner(*)").eq("package_id", props.pkgId!);
     },
     {
         onSuccess(data) {

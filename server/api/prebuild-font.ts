@@ -1,4 +1,4 @@
-import { serverSupabaseServiceRole } from "#supabase/server";
+import { serverSupabaseServiceRole, serverSupabaseUser } from "#supabase/server";
 import z from "zod";
 import { Database } from "~/types/database.types";
 import { decodeReporter } from "cn-font-split/dist/createAPI";
@@ -8,6 +8,9 @@ export const schema = z.object({
 
 // 预构建字体，保证可以获取到
 export default defineEventHandler(async (event) => {
+    const user = await serverSupabaseUser(event);
+    if (!user)
+        return createError({ statusCode: 401, statusMessage: "Unauthorized" });
     const body = await readValidatedBody(event, schema.safeParse);
     if (!body.data) {
         throw new Error("Invalid body");

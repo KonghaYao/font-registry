@@ -27,8 +27,7 @@ const userDropdowns = computed(() => [
             label: "退出登录",
             click() {
                 auth.signOut().then((res) => {
-                    ElMessage.success("请重新登录");
-                    useRouter().push("/login");
+                    ElMessage.success("退出登录成功");
                 });
             },
         },
@@ -44,9 +43,10 @@ const userDropdowns = computed(() => [
                     <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">FRP</span>
                 </NuxtLink>
                 <div class="flex items-center lg:order-2">
-                    <UDropdown :items="userDropdowns" :popper="{ placement: 'bottom-start' }">
+                    <UDropdown v-if="user?.email" :items="userDropdowns" :popper="{ placement: 'bottom-start' }">
                         <UAvatar :src="'https://cn.cravatar.com/avatar/' + md5(user?.email || '') + 's=64'"></UAvatar>
                     </UDropdown>
+                    <NuxtLink v-else to="/login"> 登录 </NuxtLink>
                 </div>
                 <div class="justify-between items-center w-full lg:flex lg:w-auto lg:order-1">
                     <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
