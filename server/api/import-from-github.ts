@@ -10,7 +10,6 @@ export const schema = z.object({
     name: z.string(),
     repo: z.string(),
     name_cn: z.string(),
-
 });
 
 /** 从 github 更新数据 */
@@ -81,22 +80,23 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         return createError({ statusCode: 400, statusMessage: error.message });
     }
 
-    const assets = response.data.flatMap((release, index) =>
-        release.assets
-            .filter((i) => {
-                return (
-                    i.state === "uploaded" &&
-                    (i.content_type.startsWith("font/") || ["otf", "ttf", "woff2"].some((ext) => i.name.endsWith(ext)))
-                );
-            })
-            .map((asset) => ({
-                version_id: data[index].id,
-                assets_name: asset.name,
-                size: asset.size,
-                download_url: asset.browser_download_url,
-                user_id: userId,
-            }))
-    );
+    const assets = response.data.flatMap((release, index) => {
+        let assetIds = release.assets.filter((i) => {
+            return (
+                i.state === "uploaded" &&
+                (i.content_type.startsWith("font/") ||
+                    ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
+            );
+        });
+        return assetIds.map((asset) => ({
+            version_id: data[index].id,
+            assets_name: asset.name,
+            size: asset.size,
+            download_url: asset.browser_download_url,
+            user_id: userId,
+        }));
+    });
+
     // 注入资源表
     const assetsInsert = await client
         .from("assets")
@@ -122,8 +122,6 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         },
     };
 });
-
-
 
 const convertReleaseToPackage =
     (packageId: number, userId: string) =>
