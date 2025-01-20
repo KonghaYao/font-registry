@@ -9,6 +9,8 @@ import { useJSON, validateJSON } from "../utils/validation";
 export const schema = z.object({
     name: z.string(),
     repo: z.string(),
+    name_cn: z.string(),
+
 });
 
 /** 从 github 更新数据 */
@@ -26,6 +28,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         owner: params.name,
         repo: params.repo,
     });
+
     const pack = await client
         .from("packages")
         .upsert(
@@ -37,6 +40,8 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
                     keywords: repo.data.topics || [],
                     readme: readme.data.content,
                     latest: "",
+                    name_cn: params.name_cn,
+                    license: repo.data.license?.name,
                     user_id: userId,
                     from: "github_api",
                 },
