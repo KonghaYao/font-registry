@@ -11,9 +11,17 @@ const pkgName = route.params.pkgName as string[];
 
 const pkgKey = pkgName.join("/");
 const client = useSupabaseClient<Database>();
+const urlConfig = reactive({ a: "", img: "" });
+provide("mdc-base-url", urlConfig);
 const pkgDetail = useAsyncData(async () => {
     if (!pkgKey) throw new Error("pkgKey is empty");
     const data = await client.from("packages").select("*").eq("name", pkgKey).single();
+    if (data.data?.from === "github_api") {
+        Object.assign(urlConfig, {
+            a: "https://github.com/" + pkgKey + "/",
+            img: "https://github.com/" + pkgKey + "/raw/HEAD/",
+        });
+    }
     return data.data;
 });
 
@@ -81,12 +89,12 @@ const fontInfoOfStyle = computed(() => {
                     :value="base64ToUtf8(pkgDetail.data.value?.readme || '')"
                     tag="article"
                 />
-                <version-panel
+                <!-- <version-panel
                     v-if="item.label === '版本'"
                     :pkg-id="pkgDetail.data.value?.id!"
                     :pkg-name="pkgDetail.data.value?.name!"
                 >
-                </version-panel>
+                </version-panel> -->
             </template>
         </UTabs>
     </div>

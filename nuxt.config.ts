@@ -6,4 +6,19 @@ export default defineNuxtConfig({
     supabase: {
         redirect: false,
     },
+    components: [
+        {
+            global: true,
+            path: "./components",
+        },
+    ],
+    mdc: {
+        components: {
+            prose: false,
+            map: {
+                a: "mdc-a",
+                img: "mdc-img",
+            },
+        },
+    },
 });
