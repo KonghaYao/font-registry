@@ -30,4 +30,8 @@ export class ZIPPath {
     getFile(innerPath: string) {
         return this.result?.file(innerPath)?.async("uint8array");
     }
+    getFileSize(innerPath: string): number {
+        /** @ts-ignore */
+        return this.result?.file(innerPath)?._data?.uncompressedSize;
+    }
 }

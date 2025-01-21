@@ -9,9 +9,17 @@ export const schema = z.object({
     path: z.string(),
 });
 
+// 下载 zip 内的文件
 export default defineCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
-    const zip = new ZIPPath(decodeURIComponent(params.url));
+    const url = decodeURIComponent(params.url.replace("github.com", "ghproxy.cn/github.com"));
+    const zip = new ZIPPath(url);
     await zip.cacheFetch();
+    // 设置响应头部
+    setResponseHeader(event, "Content-Type", "application/octet-stream");
+    setResponseHeader(event, "Content-Disposition", `attachment; filename=${params.path.split("/").at(-1)}`);
+
+    // 发送文件流作为响应
+    event.node.res.statusCode = 200;
     return zip.getFile(params.path);
 });

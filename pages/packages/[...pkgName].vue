@@ -64,6 +64,7 @@ const fontInfoOfStyle = computed(() => {
         />
         <div class="my-6 p-8 bg-blue-50">
             <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
+                {{ pkgDetail.data.value?.name_cn }}
                 {{ pkgDetail.data.value?.name }}
             </div>
             <div>
