@@ -13,7 +13,9 @@ export const schema = z.object({
 });
 
 /** 从 github 更新数据 */
-export default defineCompose(authRunner, validateJSON(schema), async (event) => {
+export default defineCompose(
+    authRunner,
+     validateJSON(schema), async (event) => {
     const user = useUser(event)!;
     const params: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole<Database>(event);
@@ -102,21 +104,43 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         return createError({ statusCode: 400, statusMessage: error.message });
     }
 
-    const assets = response.data.flatMap((release, index) => {
-        let assetIds = release.assets.filter((i) => {
-            return (
-                i.state === "uploaded" &&
-                (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
-            );
-        });
-        return assetIds.map((asset) => ({
-            version_id: data[index].id,
-            assets_name: asset.name,
-            size: asset.size,
-            download_url: asset.browser_download_url,
-            user_id: userId,
-        }));
-    });
+    const assets = await Promise.all(
+        response.data.map(async (release, index) => {
+            let zipFiles: any[] = [];
+            let assetIds = release.assets.filter((i) => {
+                if (i.content_type === "application/zip") zipFile.push(asset);
+                return (
+                    i.state === "uploaded" &&
+                    (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
+                );
+            });
+
+            for (const zipFile of zipFiles) {
+                const zip = new ZIPPath(zipFile.browser_download_url);
+                await zip.cacheFetch();
+                const filePaths = zip.getPaths();
+                filePaths.forEach((path) => {
+                    if (["otf", "ttf"].some((ext) => path.endsWith(ext))) {
+                        console.log(path);
+                        assetIds.push({
+                            name: path.split("/")[1],
+                            browser_download_url: `/api/zip/get?url=${encodeURIComponent(
+                                zipFile.browser_download_url
+                            )}&path=${path}`,
+                        });
+                    }
+                });
+            }
+
+            return assetIds.map((asset) => ({
+                version_id: data[index].id,
+                assets_name: asset.name,
+                size: asset.size,
+                download_url: asset.browser_download_url,
+                user_id: userId,
+            }));
+        })
+    );
 
     // 注入资源表
     const assetsInsert = await client
