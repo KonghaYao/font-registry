@@ -15,7 +15,7 @@ export const useSSE = (
         return sse.push(JSON.stringify(data));
     };
     sse.log = (message: string) => {
-        return sse.push(message);
+        return sse.push(JSON.stringify(message));
     };
     return sse;
 };

@@ -6,7 +6,7 @@ import { Database } from "~/types/database.types";
 import { defineCompose } from "../utils/compose";
 import { authRunner, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
-
+import { sseResponse, useSSE } from "../utils/useSSE";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
@@ -168,7 +168,7 @@ export default defineCompose(
                 onConflict: "version_id,assets_name",
             })
             .select();
-        sse.log(`导入 github assets ${assetsInsert.count} 个`);
+        sse.log(`导入 github assets ${assetsInsert.data?.length} 个`);
         if (assetsInsert.error)
             return createError({
                 statusCode: 400,

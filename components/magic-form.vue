@@ -26,24 +26,20 @@ const maxLabelWidth = computed(() => {
 </script>
 
 <template>
-    <!-- 使用 ElForm -->
-    <u-card>
-        <el-form :model="modelValue" :label-width="maxLabelWidth" class="max-w-xl">
-            <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
-            <el-form-item v-for="item in config" :key="item.value" :label="item.label" :rules="item.rules">
-                <el-input v-if="item.type === 'input'" v-model="modelValue[item.value]" :type="item.type" />
-                <span v-else>
-                    {{ showValue(modelValue[item.value], item) }}
-                </span>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" :loading="submit.loading" @click="() => submit.fetch(props.modelValue)">
-                    提交
-                </el-button>
-                <span>
-                    {{ message }}
-                </span>
-            </el-form-item>
-        </el-form>
-    </u-card>
+    <el-form :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
+        <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
+        <el-form-item v-for="item in config" :key="item.value" :label="item.label" :rules="item.rules">
+            <el-input v-if="item.type === 'input'" v-model="modelValue[item.value]" :type="item.type" />
+            <span v-else>
+                {{ showValue(modelValue[item.value], item) }}
+            </span>
+        </el-form-item>
+        <el-form-item class="flex gap-4 mt-3">
+            <el-button type="primary" :loading="submit.loading" @click="() => submit.fetch(props.modelValue)">
+                提交
+            </el-button>
+            <slot name="button"></slot>
+            <el-alert v-if="message" :title="message" type="warning" />
+        </el-form-item>
+    </el-form>
 </template>

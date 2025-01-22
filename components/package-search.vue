@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import type { Database } from '~/types/database.types';
+import type { Database } from "~/types/database.types";
+import { debounce } from "lodash";
 const state = ref("");
-const client = useSupabaseClient<Database>();
-const querySearch = (queryString: string, cb: any) => {
-    client
-        .from("packages")
-        .select("*")
-        .or(`name.ilike.%${queryString}%,description.ilike.%${queryString}%`)
-        .limit(20)
+const querySearch = debounce((queryString: string, cb: any) => {
+    fetch("/api/packages/list?query=" + queryString)
+        .then((res) => res.json())
         .then((res) => {
             cb(res.data);
         });
-};
+}, 300);
 const handleSelect = (item: Record<string, any>) => {
     navigateTo(`/packages/${item.name}`);
 };
@@ -21,12 +18,15 @@ const handleSelect = (item: Record<string, any>) => {
     <div class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b">
         <el-autocomplete v-model="state" :fetch-suggestions="querySearch" placeholder="搜索字体" @select="handleSelect">
             <template #default="{ item }">
-                <div class="value">
+                <el-space spacer=" | " class="value">
+                    <b>
+                        {{ item.name_cn }}
+                    </b>
                     <b>
                         {{ item.name }}
                     </b>
                     {{ item.description }}
-                </div>
+                </el-space>
             </template>
         </el-autocomplete>
     </div>

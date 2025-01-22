@@ -17,3 +17,16 @@ export const defineCompose = <T extends EventHandlerRequest, D>(...args: Compose
         }
     });
 };
+
+export const defineCachedCompose =
+    <T extends EventHandlerRequest, D>(opts: Parameters<typeof defineCachedEventHandler<T>>[1]) =>
+    (...args: ComposeEventHandler<T, D>[]) => {
+        return defineCachedEventHandler<T>(async (event) => {
+            for (const handler of args) {
+                const result = await handler(event);
+                if (result) {
+                    return result;
+                }
+            }
+        }, opts);
+    };

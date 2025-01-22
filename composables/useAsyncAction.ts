@@ -43,7 +43,7 @@ export function useAsyncAction<Input, Output, Message>(
     });
 }
 
-export function useAsyncJSON<Input, Output, Message>(
+export function useAsyncJSON<Input, Output, Message = Output>(
     fn: (input: Input) => {
         url: string;
         method?: "get" | "post";
@@ -91,6 +91,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                 headers: {
                     "Content-Type": data.method === "post" ? "application/json" : "",
                 },
+                openWhenHidden: true,
                 async onopen(response) {
                     if (response.ok) {
                         return; // everything's good
@@ -118,7 +119,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                     events?.onReceive?.(message, input);
                 },
                 onerror(err) {
-                    events?.onError?.(err as Error, input);
+                    throw err;
                 },
                 body: data.method === "post" ? JSON.stringify(data.body) : undefined,
             }).catch((err) => {
