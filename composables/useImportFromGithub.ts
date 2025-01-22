@@ -1,7 +1,8 @@
+import type { InputSchema } from "~/server/api/import-from-github";
 import { useAsyncJSON } from "./useAsyncAction";
 
 export const useImportFromGithub = () => {
-    const request = useAsyncJSON<{ name: string; repo: string; name_cn: string }, { code: 0 }>(
+    const request = useAsyncSSEJSON<InputSchema, { code: 0 }, string>(
         (data) => {
             return {
                 url: "/api/import-from-github",

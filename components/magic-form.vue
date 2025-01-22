@@ -6,6 +6,7 @@ const props = defineProps<{
     modelValue: any;
     title?: string;
     submitAction: (input: any) => Promise<any>;
+    message?: string;
 }>();
 
 const submit = useAsyncAction(props.submitAction);
@@ -39,6 +40,9 @@ const maxLabelWidth = computed(() => {
                 <el-button type="primary" :loading="submit.loading" @click="() => submit.fetch(props.modelValue)">
                     提交
                 </el-button>
+                <span>
+                    {{ message }}
+                </span>
             </el-form-item>
         </el-form>
     </u-card>

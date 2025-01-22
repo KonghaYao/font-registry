@@ -5,6 +5,7 @@ import { decodeReporter } from "cn-font-split/dist/createAPI";
 import { defineCompose } from "../utils/compose";
 import { authRunner, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
+export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
 });
@@ -40,7 +41,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             asset.assets_name +
             "/"
         ).replaceAll(".", "_");
-        await fetch("https://cn-font-5hrt.shuttle.app/upload", {
+        await fetch(process.env.SPLIT_SERVER + "/upload", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -55,9 +56,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
                 console.log(res);
             });
         console.log("构建完成", file_folder);
-        const bin = await fetch("https://ik.imagekit.io/cnfont2" + file_folder + "reporter.bin").then((res) =>
-            res.arrayBuffer()
-        );
+        const bin = await fetch(process.env.CDN_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
             version: version.data.version,

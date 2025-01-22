@@ -1,16 +1,22 @@
+import { fetchEventSource } from "@ai-zen/node-fetch-event-source";
 export interface AsyncState<Input, Output> {
     data: Output | null;
     error: Error | null;
     loading: boolean;
     refetch: (input: Input | null) => Promise<void>;
 }
-export interface AsyncEvent<Input, Output> {
+export interface AsyncEvent<Input, Output, Message = Output> {
     onError?: (err: Error, input: Input) => void;
     onSuccess?: (data: Output, input: Input) => void;
+    /** sse 才能实现 */
+    onReceive?: (data: Message, input: Input) => void;
 }
-export function useAsyncAction<Input, Output>(
+
+export type ActionType = Awaited<ReturnType<typeof useAsyncAction>>;
+
+export function useAsyncAction<Input, Output, Message>(
     fn: (input: Input) => Promise<Output>,
-    events?: AsyncEvent<Input, Output>
+    events?: AsyncEvent<Input, Output, Message>
 ) {
     const refetch = async function (input: Input) {
         /** @ts-ignore */
@@ -37,29 +43,88 @@ export function useAsyncAction<Input, Output>(
     });
 }
 
-export function useAsyncJSON<Input, Output>(
+export function useAsyncJSON<Input, Output, Message>(
     fn: (input: Input) => {
         url: string;
         method?: "get" | "post";
         body?: Input;
     },
-    events?: AsyncEvent<Input, Output>
+    events?: AsyncEvent<Input, Output, Message>
 ) {
-    return useAsyncAction<Input, Output>(async (input) => {
+    return useAsyncAction<Input, Output, Message>(async (input) => {
         const data = fn(input);
         data.method = data.method ?? "get";
 
         return $fetch(data.url, {
             method: data.method,
             headers: {
-                "Content-Type":
-                    data.method === "post" ? "application/json" : "",
+                "Content-Type": data.method === "post" ? "application/json" : "",
             },
             params: data.method === "get" ? (data.body as any) : undefined,
-            body:
-                data.method === "post" ? JSON.stringify(data.body) : undefined,
+            body: data.method === "post" ? JSON.stringify(data.body) : undefined,
             server: false,
             lazy: true,
         });
     }, events);
+}
+export type SSEActionType<Message> = ActionType & {
+    message: Message | undefined;
+};
+export function useAsyncSSEJSON<Input, Output, Message>(
+    fn: (input: Input) => {
+        url: string;
+        method?: "get" | "post";
+        body?: Input;
+    },
+    events?: AsyncEvent<Input, Output, Message>
+): SSEActionType<Message> {
+    const action: any = useAsyncAction<Input, Output, Message>(async (input) => {
+        const data = fn(input);
+        data.method = data.method ?? "get";
+        if (data.method === "get") {
+            const qs = new URLSearchParams(Object.entries(data.body as any));
+            data.url += "?" + qs.toString();
+        }
+        return new Promise<Output>((res, rej) => {
+            fetchEventSource(data.url, {
+                method: data.method,
+                headers: {
+                    "Content-Type": data.method === "post" ? "application/json" : "",
+                },
+                async onopen(response) {
+                    if (response.ok) {
+                        return; // everything's good
+                    } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+                        // client-side errors are usually non-retriable:
+                        throw new Error(`Client-side error: ${response.status}`);
+                    } else {
+                        throw new Error(`Server-side error: ${response.status}`);
+                    }
+                },
+                onmessage(msg) {
+                    // if the server emits an error message, throw an exception
+                    // so it gets handled by the onerror callback below:
+                    if (msg.event === "Error") {
+                        throw new Error(msg.data);
+                    }
+                    if (msg.event === "End") {
+                        const finalData = JSON.parse(msg.data);
+                        res(finalData);
+                        events?.onSuccess?.(finalData, input);
+                        return;
+                    }
+                    const message = JSON.parse(msg.data) as Message;
+                    action.message = message;
+                    events?.onReceive?.(message, input);
+                },
+                onerror(err) {
+                    events?.onError?.(err as Error, input);
+                },
+                body: data.method === "post" ? JSON.stringify(data.body) : undefined,
+            }).catch((err) => {
+                rej(err);
+            });
+        });
+    }, events);
+    return action as SSEActionType<Message>;
 }

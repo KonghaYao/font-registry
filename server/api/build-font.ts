@@ -4,6 +4,9 @@ import { Database } from "~/types/database.types";
 import { decodeReporter } from "cn-font-split/dist/createAPI";
 import { defineCompose } from "../utils/compose";
 import { useJSON, validateJSON } from "../utils/validation";
+
+export type InputSchema = z.infer<typeof schema>;
+
 export const schema = z.object({
     name: z.string(),
     version: z.string(),

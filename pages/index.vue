@@ -30,6 +30,7 @@ const upload = (data: any) => {
         model.value = {};
     });
 };
+
 </script>
 
 <template>
@@ -37,5 +38,6 @@ const upload = (data: any) => {
     <button @click="handlePrebuild">
         {{ imported.loading ? 1 : 0 }}
     </button>
-    <magic-form :config="configs" v-model="model" :submit-action="upload" :title="'导入 Github 仓库字体'"></magic-form>
+        
+    <magic-form :config="configs" v-model="model" :submit-action="upload" :title="'导入 Github 仓库字体'" :message="imported.message"></magic-form>
 </template>
