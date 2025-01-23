@@ -18,6 +18,7 @@ export default defineNuxtConfig({
             cache: {
                 driver: "netlify-blobs",
                 options: {
+                    name: "server-cache",
                     deployScoped: true,
                 },
             },
