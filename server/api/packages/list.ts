@@ -10,7 +10,6 @@ export const schema = z.object({
 export default defineCachedCompose({
     maxAge: 10 * 60,
     getKey: (e) => e.path,
-    base: "kv",
 })(validateQuery(schema), async (event) => {
     const data: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole(event);

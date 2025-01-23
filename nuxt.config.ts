@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     ],
     nitro: {
         storage: {
-            kv: {
+            cache: {
                 driver: "netlify-blobs",
                 options: {
                     deployScoped: true,
