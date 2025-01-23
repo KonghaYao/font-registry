@@ -16,7 +16,9 @@ export default defineNuxtConfig({
     nitro: {
         storage: {
             driver: netlifyBlobsDriver({
-                deployScoped: true
+                deployScoped: true,
+                siteID: process.env.SITE_ID,
+                token: process.env.NETLIFY_API_TOKEN,
             }),
         },
     },
