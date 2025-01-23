@@ -1,3 +1,4 @@
+import netlifyBlobsDriver from "unstorage/drivers/netlify-blobs";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: "2024-11-01",
@@ -12,6 +13,13 @@ export default defineNuxtConfig({
             path: "./components",
         },
     ],
+    nitro: {
+        storage: {
+            driver: netlifyBlobsDriver({
+                deployScoped: true,
+            }),
+        },
+    },
     mdc: {
         components: {
             prose: false,
