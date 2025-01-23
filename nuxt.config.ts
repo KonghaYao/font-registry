@@ -17,6 +17,8 @@ export default defineNuxtConfig({
         storage: {
             driver: netlifyBlobsDriver({
                 deployScoped: true,
+                siteID: process.env.SITE_ID,
+                token: process.env.NETLIFY_API_TOKEN,
             }),
         },
     },
