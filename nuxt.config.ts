@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     nitro: {
         storage: {
             cache: {
+                name: "server-cache",
                 driver: "netlify-blobs",
                 options: {
                     name: "server-cache",
