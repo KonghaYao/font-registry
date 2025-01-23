@@ -1,5 +1,5 @@
 import z from "zod";
-import { defineCachedCompose } from "../../utils/compose";
+import { ComposeEventHandler, defineCachedCompose, EndPoint, WrappedEventHandler } from "../../utils/compose";
 import { validateQuery, useJSON } from "../../utils/validation";
 import { serverSupabaseServiceRole } from "#supabase/server";
 export const schema = z.object({
@@ -7,7 +7,7 @@ export const schema = z.object({
     query: z.optional(z.string()),
 });
 
-export default defineCachedCompose(validateQuery(schema), async (event) => {
+const api = defineCachedCompose(validateQuery(schema), async (event) => {
     const data: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole(event);
     let chain = client
@@ -21,3 +21,4 @@ export default defineCachedCompose(validateQuery(schema), async (event) => {
     maxAge: 10 * 60,
     getKey: (e) => e.path,
 });
+export default api;

@@ -4,7 +4,7 @@ import type { H3Event } from "h3";
 
 /** 验证 JSON 入参正确 **/
 export const validateJSON =
-    <T extends z.ZodTypeAny>(schema: T): ComposeEventHandler =>
+    <T extends z.ZodTypeAny>(schema: T): ComposeEventHandler<z.infer<T>> =>
     async (event) => {
         const body = await readValidatedBody(event, schema.safeParse);
         if (!body.data) {
@@ -17,7 +17,7 @@ export const validateJSON =
     };
 /** 验证 Query 入参正确 **/
 export const validateQuery =
-    <T extends z.ZodTypeAny>(schema: T): ComposeEventHandler =>
+    <T extends z.ZodTypeAny>(schema: T): ComposeEventHandler<z.infer<T>> =>
     async (event) => {
         const body = await getValidatedQuery(event, schema.safeParse);
         if (!body.data) {

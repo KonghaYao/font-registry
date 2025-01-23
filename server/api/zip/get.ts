@@ -1,5 +1,5 @@
-import z from "zod";
-import { defineCompose } from "../../utils/compose";
+import z, { output } from "zod";
+import { defineCompose, EndPoint, WrappedEventHandler } from "../../utils/compose";
 import { useJSON, validateQuery } from "../../utils/validation";
 import { ZIPPath } from "../../utils/zip";
 export const schema = z.object({
@@ -10,7 +10,7 @@ export const schema = z.object({
 });
 
 // 下载 zip 内的文件
-export default defineCompose(validateQuery(schema), async (event) => {
+const api = defineCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
     const url = decodeURIComponent(params.url.replace("github.com", "ghproxy.cn/github.com"));
     const zip = new ZIPPath(url);
@@ -23,3 +23,6 @@ export default defineCompose(validateQuery(schema), async (event) => {
     event.node.res.statusCode = 200;
     return zip.getFile(params.path);
 });
+type Input = typeof api extends WrappedEventHandler<infer I, unknown> ? I : never;
+type Output = typeof api extends WrappedEventHandler<unknown, infer O> ? O : never;
+export default api;
