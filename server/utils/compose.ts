@@ -7,7 +7,9 @@ export interface ComposeEventHandler<
     (event: H3Event<Request>): Response;
 }
 /** 简单实现 compose，并不需要 next 函数来支持 */
-export const defineCompose = <T extends EventHandlerRequest, D>(...args: ComposeEventHandler<T, D>[]) => {
+export const defineCompose = <T extends EventHandlerRequest, D>(
+    ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
+) => {
     return defineEventHandler<T>(async (event) => {
         for (const handler of args) {
             const result = await handler(event);
@@ -18,10 +20,11 @@ export const defineCompose = <T extends EventHandlerRequest, D>(...args: Compose
     });
 };
 
-export const defineCachedCompose =
-    <T extends EventHandlerRequest, D>(opts: Parameters<typeof defineCachedEventHandler<T>>[1]) =>
-    (...args: ComposeEventHandler<T, D>[]) => {
-        return defineCachedEventHandler<T>(async (event) => {
+export const defineCachedCompose = <T extends EventHandlerRequest, D>(
+    ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
+) => {
+    return (opts: Parameters<typeof defineCachedEventHandler<T>>[1]) =>
+        defineCachedEventHandler<T>(async (event) => {
             for (const handler of args) {
                 const result = await handler(event);
                 if (result) {
@@ -29,4 +32,4 @@ export const defineCachedCompose =
                 }
             }
         }, opts);
-    };
+};
