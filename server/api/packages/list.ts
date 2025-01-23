@@ -8,15 +8,16 @@ export const schema = z.object({
 });
 
 export default defineCachedCompose({
-    maxAge: 60 * 60,
+    maxAge: 10 * 60,
     getKey: (e) => e.path,
 })(validateQuery(schema), async (event) => {
     const data: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole(event);
-    return client
+    let chain = client
         .from("packages")
-        .select("name,latest,keywords,name_cn,created_at,homepage,description,license,author!inner(*)")
-        .or(["name", "name_cn", "description"].map((i) => `${i}.ilike.%${data.query}%`).join(","))
-        .order("created_at", { ascending: false })
-        .limit(10);
+        .select("name,latest,keywords,name_cn,created_at,homepage,description,license,author!inner(*)");
+
+    if (data.query)
+        chain = chain.or(["name", "name_cn", "description"].map((i) => `${i}.ilike.%${data.query}%`).join(","));
+    return chain.order("created_at", { ascending: false }).limit(10);
 });

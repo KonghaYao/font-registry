@@ -14,13 +14,11 @@ export default defineNuxtConfig({
         },
     ],
     nitro: {
-        // storage: {
-        //     driver: netlifyBlobsDriver({
-        //         deployScoped: true,
-        //         siteID: process.env.SITE_ID,
-        //         token: process.env.NETLIFY_API_TOKEN,
-        //     }),
-        // },
+        storage: {
+            driver: netlifyBlobsDriver({
+                deployScoped: true
+            }),
+        },
     },
     mdc: {
         components: {
