@@ -1,0 +1,1 @@
+sed -i '/exports/ a\    "./runtime/node/string_decoder/index/": {\n      "types": "./runtime/node/string_decoder/index.d.ts",\n      "require": "./runtime/node/string_decoder/index.cjs",\n      "import": "./runtime/node/string_decoder/index.mjs"\n    },' node_modules/unenv/package.json
