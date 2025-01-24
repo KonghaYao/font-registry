@@ -1,5 +1,8 @@
 import type { EventHandlerResponse, H3Event, EventHandler, EventHandlerRequest } from "h3";
-
+/** @ts-ignore */
+import setImmediateShim from "set-immediate-shim";
+/** @ts-ignore */
+if (!globalThis.setImmediate) globalThis.setImmediate = setImmediateShim;
 /** 用于标记函数返回的类型，无实际用途 */
 export interface WrappedEventHandler<Input = unknown, Response extends EventHandlerResponse = EventHandlerResponse>
     extends EventHandler<EventHandlerRequest, Promise<{} | undefined>> {}

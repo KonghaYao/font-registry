@@ -10,7 +10,7 @@ export const schema = z.object({
 });
 
 // 下载 zip 内的文件
-const api = defineCompose(validateQuery(schema), async (event) => {
+const api = defineCachedCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
     const url = decodeURIComponent(params.url).replace("github.com", "ghproxy.cn/github.com");
     const zip = new ZIPPath(url);
@@ -22,6 +22,9 @@ const api = defineCompose(validateQuery(schema), async (event) => {
     // 发送文件流作为响应
     event.node.res.statusCode = 200;
     return zip.getFile(params.path);
+})({
+    maxAge: 30 * 24 * 60 * 60,
+    getKey: (e) => e.path,
 });
 type Input = typeof api extends WrappedEventHandler<infer I, unknown> ? I : never;
 type Output = typeof api extends WrappedEventHandler<unknown, infer O> ? O : never;
