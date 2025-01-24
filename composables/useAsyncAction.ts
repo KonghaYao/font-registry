@@ -52,7 +52,6 @@ export function useAsyncJSON<Input, Output, Message = Output>(
     fn: (input: Input) => RequestType<Input> | Promise<RequestType<Input>>,
     events?: AsyncEvent<Input, Output, Message>
 ) {
-    const f = useFetch();
     return useAsyncAction<Input, Output, Message>(async (input) => {
         const data = await fn(input);
         data.body = data.body ?? input;

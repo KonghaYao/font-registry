@@ -12,7 +12,7 @@ export const schema = z.object({
 // 下载 zip 内的文件
 const api = defineCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
-    const url = decodeURIComponent(params.url.replace("github.com", "ghproxy.cn/github.com"));
+    const url = decodeURIComponent(params.url).replace("github.com", "ghproxy.cn/github.com");
     const zip = new ZIPPath(url);
     await zip.cacheFetch();
     // 设置响应头部

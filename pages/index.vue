@@ -3,7 +3,7 @@ import { useMagicDialog } from "~/composables/useMagicDialog";
 
 const user = useSupabaseUser();
 const prebuild = usePreBuildFont();
-const handlePrebuild = () => prebuild.fetch({ name: "lxgw/kose-font" });
+const handlePrebuild = () => prebuild.fetch({ name: "atelier-anchor/smiley-sans", force: true });
 </script>
 
 <template>

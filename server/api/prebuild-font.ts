@@ -8,6 +8,7 @@ import { useJSON, validateJSON } from "../utils/validation";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
+    force: z.optional(z.boolean()),
 });
 
 export default defineCompose(authRunner, validateJSON(schema), async (event) => {
@@ -19,7 +20,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
 
     const style = pkg.data.style;
     // @ts-ignore
-    if (!style || style.version !== pkg.data.latest) {
+    if (!style || style.version !== pkg.data.latest || body.force) {
         const version = await client
             .from("versions")
             .select("*")
@@ -41,13 +42,16 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             asset.assets_name +
             "/"
         ).replaceAll(".", "_");
+        console.log(asset.download_url);
         await fetch(process.env.SPLIT_SERVER + "/upload", {
             method: "POST",
             headers: {
+                authorization:
+                    "Bearer " + (await sha256(process.env.SPLIT_SERVER_TOKEN! + Math.floor(Date.now() / 10000))),
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                file_url: asset.download_url,
+                file_url: new URL(asset.download_url, process.env.WEBSITE_URL),
                 file_folder,
             }),
         })
@@ -55,8 +59,10 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             .then((res) => {
                 console.log(res);
             });
+
         console.log("构建完成", file_folder);
-        const bin = await fetch(process.env.CDN_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
+
+        const bin = await fetch(process.env.OSS_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
             version: version.data.version,
@@ -76,3 +82,17 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
     }
     return style;
 });
+async function sha256(message: string) {
+    // 将输入字符串转换为 UTF-8 编码的 Uint8Array
+    const encoder = new TextEncoder();
+    const data = encoder.encode(message);
+
+    // 使用 crypto.subtle 模块来计算 SHA-256 哈希值
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+    // 将 ArrayBuffer 转换为十六进制字符串表示形式
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+
+    return hashHex;
+}

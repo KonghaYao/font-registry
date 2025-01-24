@@ -1,7 +1,7 @@
 import { useAsyncJSON } from "./useAsyncAction";
 
 export const usePreBuildFont = () => {
-    const request = useAsyncJSON<{ name: string }, { code: 0 }>(
+    const request = useAsyncJSON<{ name: string; force?: boolean }, { code: 0 }>(
         (data) => {
             return {
                 url: "/api/prebuild-font",
