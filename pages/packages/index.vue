@@ -2,10 +2,10 @@
 definePageMeta({
     layout: "packages",
 });
-const PackagesData = useAsyncJSON<{query?:string},any>(() =>{
+const PackagesData = useAsyncJSON<{ query?: string }, any>(() => {
     return {
         url: "/api/packages/list",
-    }
+    };
 });
 onMounted(() => {
     PackagesData.fetch({});
@@ -43,21 +43,7 @@ onMounted(() => {
                         </li>
                     </ul>
                 </div>
-                <div class="p-2 text-sm text-gray-500 flex gap-4">
-                    <a :href="pack.author?.link||''" class="flex gap-2">
-                        <img v-if="pack.author?.avatar" class="w-5 h-5 rounded-full overflow-hidden object-fit" :src="pack.author?.avatar" alt="avatar"> </img>
-                        {{ pack.author?.name }}
-                    </a>
-                    <div>
-                        {{ pack.latest }}
-                    </div>
-                    <div>
-                        {{ pack.license }}
-                    </div>
-                    <time datetime="{{ pack.created_at }}">
-                        {{ new Date(pack.created_at).toLocaleString() }}
-                    </time>
-                </div>
+                <package-detail-row :pack="pack"></package-detail-row>
             </footer>
         </u-card>
     </ul>

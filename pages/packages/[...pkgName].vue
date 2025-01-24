@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Database } from "../../types/database.types";
+import { isClient } from "@vueuse/core";
 import "github-markdown-css/github-markdown.css";
 import { createFontLink } from "~/composables/useFont";
 definePageMeta({
@@ -10,36 +10,14 @@ const route = useRoute();
 const pkgName = route.params.pkgName as string[];
 
 const pkgKey = pkgName.join("/");
-const client = useSupabaseClient<Database>();
 const urlConfig = reactive({ a: "", img: "" });
 provide("mdc-base-url", urlConfig);
-const pkgDetail = useAsyncData(async () => {
-    if (!pkgKey) throw new Error("pkgKey is empty");
-    const data = await client.from("packages").select("*").eq("name", pkgKey).single();
-    if (data.data?.from === "github_api") {
-        Object.assign(urlConfig, {
-            a: "https://github.com/" + pkgKey + "/",
-            img: "https://github.com/" + pkgKey + "/raw/HEAD/",
-        });
-    }
-    return data.data;
-});
-
-function base64ToUtf8(base64String: string) {
-    if (typeof Buffer === "function") {
-        // Node.js 环境
-        return Buffer.from(base64String, "base64").toString("utf8");
-    } else if (typeof atob === "function" && typeof TextDecoder === "function") {
-        // 浏览器环境
-        const binaryString = atob(base64String);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-        return new TextDecoder("utf-8").decode(bytes);
-    } else {
-        throw new Error("Unsupported environment");
-    }
+const pkgDetail = useFetch("/api/packages/get?pkgKey=" + pkgKey);
+if (pkgDetail.data.value?.from === "github_api") {
+    Object.assign(urlConfig, {
+        a: "https://github.com/" + pkgKey + "/",
+        img: "https://ik.imagekit.io/github/" + pkgKey + "/raw/HEAD/",
+    });
 }
 const items = [
     {
@@ -78,15 +56,14 @@ const fontInfoOfStyle = computed(() => {
             <div>
                 {{ pkgDetail.data.value?.description }}
             </div>
-            <div>最新版本： {{ pkgDetail.data.value?.latest }}</div>
+            <PackageDetailRow :pack="pkgDetail.data.value!"></PackageDetailRow>
         </div>
-
         <UTabs :items="items" :default-index="0">
             <template #item="{ item }">
                 <MDC
                     v-if="item.label === 'Readme'"
                     class="markdown-body mt-4"
-                    :value="base64ToUtf8(pkgDetail.data.value?.readme || '')"
+                    :value="pkgDetail.data.value?.readme || ''"
                     tag="article"
                 />
                 <!-- <version-panel
@@ -99,3 +76,9 @@ const fontInfoOfStyle = computed(() => {
         </UTabs>
     </div>
 </template>
+
+<style>
+.markdown-body p a {
+    display: inline;
+}
+</style>

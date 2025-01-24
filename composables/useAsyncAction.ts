@@ -30,6 +30,7 @@ export function useAsyncAction<Input, Output, Message>(
         } catch (err) {
             that.error = err as Error;
             events?.onError?.(err as Error, input);
+            console.error(err);
         } finally {
             that.loading = false;
         }
@@ -42,17 +43,19 @@ export function useAsyncAction<Input, Output, Message>(
         fetch: refetch,
     });
 }
-
+export interface RequestType<Input> {
+    url: string;
+    method?: "get" | "post";
+    body?: Input;
+}
 export function useAsyncJSON<Input, Output, Message = Output>(
-    fn: (input: Input) => {
-        url: string;
-        method?: "get" | "post";
-        body?: Input;
-    },
+    fn: (input: Input) => RequestType<Input> | Promise<RequestType<Input>>,
     events?: AsyncEvent<Input, Output, Message>
 ) {
+    const f = useFetch();
     return useAsyncAction<Input, Output, Message>(async (input) => {
-        const data = fn(input);
+        const data = await fn(input);
+        data.body = data.body ?? input;
         data.method = data.method ?? "get";
 
         return $fetch(data.url, {

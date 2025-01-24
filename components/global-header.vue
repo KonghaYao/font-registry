@@ -53,7 +53,7 @@ const userDropdowns = computed(() => [
                         <li v-for="link in links">
                             <NuxtLink
                                 :to="link.to"
-                                class="block py-2 pr-4 pl-3 text-black rounded bg-primary-700 lg:bg-transparent lg:p-0 dark:text-white"
+                                class="block py-2 pr-4 pl-3 hover:text-primary-700 transition-all rounded lg:p-0 dark:text-white"
                                 aria-current="page"
                             >
                                 {{ link.name }}
