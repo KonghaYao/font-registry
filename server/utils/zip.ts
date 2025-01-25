@@ -1,37 +1,34 @@
 import JSZip from "jszip";
 
 export class ZIPPath {
-    static cache = new Map<string, JSZip>();
+    static cache = useStorage<ArrayBuffer>("zip-cache");
     constructor(public url: string) {}
 
-    get result(): JSZip | undefined | null {
-        return ZIPPath.cache.get(this.url);
+    getResult(): Promise<Uint8Array | undefined | null> {
+        return ZIPPath.cache.getItemRaw(this.url);
     }
-    set result(value: JSZip) {
-        ZIPPath.cache.set(this.url, value);
+    setResult(value: Uint8Array) {
+        ZIPPath.cache.setItemRaw(this.url, value);
     }
+    zip: JSZip | undefined;
     async cacheFetch() {
-        if (this.result) return this.result;
+        const cache = await this.getResult();
+        if (cache) return this.getResult();
         const res = await fetch(this.url);
-        const blob = await res.arrayBuffer();
-        this.result = await new JSZip().loadAsync(new Uint8Array(blob));
-        setTimeout(() => {
-            this.clearCache();
-        }, 24 * 60 * 60 * 1000);
-    }
-    clearCache() {
-        ZIPPath.cache.delete(this.url);
+        const blob = new Uint8Array(await res.arrayBuffer());
+        this.setResult(blob);
+        this.zip = await new JSZip().loadAsync(blob);
     }
     getPaths() {
         const all: string[] = [];
-        this.result?.forEach((path, file) => all.push(path));
+        this.zip?.forEach((path, file) => all.push(path));
         return all;
     }
     getFile(innerPath: string) {
-        return this.result?.file(innerPath)?.async("uint8array");
+        return this.zip?.file(innerPath)?.async("uint8array");
     }
     getFileSize(innerPath: string): number {
         /** @ts-ignore */
-        return this.result?.file(innerPath)?._data?.uncompressedSize;
+        return this.zip?.file(innerPath)?._data?.uncompressedSize;
     }
 }

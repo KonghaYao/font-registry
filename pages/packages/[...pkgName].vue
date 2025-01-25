@@ -66,12 +66,12 @@ const fontInfoOfStyle = computed(() => {
                     :value="pkgDetail.data.value?.readme || ''"
                     tag="article"
                 />
-                <!-- <version-panel
+                <version-panel
                     v-if="item.label === '版本'"
                     :pkg-id="pkgDetail.data.value?.id!"
                     :pkg-name="pkgDetail.data.value?.name!"
                 >
-                </version-panel> -->
+                </version-panel>
             </template>
         </UTabs>
     </div>

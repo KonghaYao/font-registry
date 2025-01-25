@@ -10,7 +10,7 @@ export const schema = z.object({
 const api = defineCachedCompose(validateQuery(schema), async (event) => {
     const data: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole(event);
-    let chain = await client.from("packages").select("*").eq("name", data.pkgKey).single();
+    let chain = await client.from("packages").select("*, author!inner(*)").eq("name", data.pkgKey).single();
     if (chain.data?.readme && !chain.data.readme.includes(" ")) {
         chain.data.readme = base64ToUtf8(chain.data.readme);
         if (chain.data.from === "github_api") {

@@ -132,9 +132,7 @@ export default defineCompose(
 
                     for (const zipFile of zipFiles) {
                         console.log(zipFile.browser_download_url);
-                        const zip = new ZIPPath(
-                            zipFile.browser_download_url.replace("github.com", "ghproxy.cn/github.com")
-                        );
+                        const zip = new ZIPPath(zipFile.browser_download_url);
                         await zip.cacheFetch();
                         const filePaths = zip.getPaths();
                         filePaths.forEach((path) => {
