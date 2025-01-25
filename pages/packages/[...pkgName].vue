@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { isClient } from "@vueuse/core";
 import "github-markdown-css/github-markdown.css";
 import { createFontLink } from "~/composables/useFont";
 definePageMeta({
@@ -34,6 +33,18 @@ const fontInfoOfStyle = computed(() => {
         file_name: string;
     };
 });
+useHead({
+    link: [
+        {
+            href: createFontLink(
+                pkgDetail.data.value?.name,
+                pkgDetail.data.value?.latest,
+                fontInfoOfStyle.value?.file_name
+            ),
+            rel: "stylesheet",
+        },
+    ],
+});
 </script>
 <template>
     <div
@@ -43,11 +54,6 @@ const fontInfoOfStyle = computed(() => {
             fontWeight: fontInfoOfStyle.weight,
         }"
     >
-        <link
-            v-if="pkgDetail.data.value?.name && fontInfoOfStyle?.file_name"
-            rel="stylesheet"
-            :href="createFontLink(pkgDetail.data.value?.name, pkgDetail.data.value?.latest, fontInfoOfStyle?.file_name)"
-        />
         <div class="my-6 p-8 bg-blue-50">
             <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
                 {{ pkgDetail.data.value?.name_cn }}
