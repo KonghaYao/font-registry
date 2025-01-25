@@ -4,5 +4,4 @@ export default defineCachedCompose(async (event) => {
     return fetch(process.env.OSS_ROOT + "/" + extra);
 })({
     maxAge: 24 * 60 * 60,
-    getKey: (e) => e.path,
 });
