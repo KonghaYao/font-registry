@@ -4,11 +4,11 @@ const user = useSupabaseUser();
 const { auth } = useSupabaseClient();
 const links = [
     {
-        name: "Home",
+        name: "首页",
         to: "/",
     },
     {
-        name: "字体",
+        name: "字体库",
         to: "/packages",
     },
 ];
@@ -18,6 +18,14 @@ const userDropdowns = computed(() => [
             label: user.value?.email ?? "账号详情",
             click() {
                 useRouter().push("/user");
+            },
+        },
+    ],
+    [
+        {
+            label: "缓存管理",
+            click() {
+                useRouter().push("/cache");
             },
         },
     ],
@@ -35,8 +43,8 @@ const userDropdowns = computed(() => [
 </script>
 
 <template>
-    <header>
-        <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b">
+    <header class="sticky top-0 left-0 z-50">
+        <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-3 dark:bg-gray-800 border-b">
             <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                 <NuxtLink to="/" class="flex items-center">
                     <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">FRP</span>
@@ -47,12 +55,14 @@ const userDropdowns = computed(() => [
                     </UDropdown>
                     <NuxtLink v-else to="/login"> 登录 </NuxtLink>
                 </div>
-                <div class="justify-between items-center w-full lg:flex lg:w-auto lg:order-1">
-                    <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+                <div
+                    class="justify-between items-center w-full lg:flex lg:w-auto lg:order-1 border-t mt-2 lg:mt-0 lg:border-t-0"
+                >
+                    <ul class="flex font-medium flex-row lg:space-x-8">
                         <li v-for="link in links">
                             <NuxtLink
                                 :to="link.to"
-                                class="block py-2 pr-4 pl-3 hover:text-primary-700 transition-all rounded lg:p-0 dark:text-white"
+                                class="block pt-2 lg:py-2 pr-4 hover:text-primary-700 transition-all rounded lg:p-0 dark:text-white"
                                 aria-current="page"
                             >
                                 {{ link.name }}

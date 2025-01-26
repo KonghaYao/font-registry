@@ -77,4 +77,12 @@ body {
 .el-form-item__label {
     padding: 0 1rem 0 0;
 }
+.h-page {
+    height: calc(100vh - 98px);
+}
+@media (min-width: 1024px) {
+    .h-page {
+        height: calc(100vh - 65px);
+    }
+}
 </style>

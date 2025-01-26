@@ -15,7 +15,7 @@
         </u-card>
         <u-card class="w-full p-4">
             <el-row class="mb-4">
-                <div class="font-bold text-2xl">My Packages</div>
+                <div class="font-bold text-2xl">Packages</div>
             </el-row>
             <el-row>
                 <el-col :span="24" v-for="item in packages.data" :key="item.id" class="mb-4">
@@ -45,7 +45,7 @@ const config = computed(() => [
 
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    const { data, error } = await client.from("packages").select("*").eq("user_id", user.value?.id!).select();
+    const { data, error } = await client.from("packages").select("name_cn,name").eq("user_id", user.value?.id!);
     if (error) throw error;
     return data;
 });

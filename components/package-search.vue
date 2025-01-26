@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Database } from "~/types/database.types";
 import { debounce } from "lodash";
 const state = ref("");
 const querySearch = debounce((queryString: string, cb: any) => {
@@ -15,7 +14,9 @@ const handleSelect = (item: Record<string, any>) => {
 </script>
 
 <template>
-    <div class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b">
+    <div
+        class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b sticky left-0 top-24 lg:top-16 z-40"
+    >
         <el-autocomplete v-model="state" :fetch-suggestions="querySearch" placeholder="搜索字体" @select="handleSelect">
             <template #default="{ item }">
                 <el-space spacer=" | " class="value">
