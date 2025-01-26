@@ -26,10 +26,14 @@ export const defineCompose = <T, D>(
     ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
 ): WrappedEventHandler<T, D> => {
     return defineEventHandler(async (event) => {
+        event.context._afterResponse = [];
         for (const handler of args) {
             try {
                 const result = await handler(event);
                 if (result) {
+                    for (const callback of event.context._afterResponse as AfterResponseCallback<D>[]) {
+                        await callback(result as D);
+                    }
                     return result;
                 }
             } catch (e) {
@@ -41,6 +45,11 @@ export const defineCompose = <T, D>(
             }
         }
     });
+};
+
+export type AfterResponseCallback<T> = (result: T) => Promise<void> | void;
+export const useAfterResponse = <T>(event: H3Event, callback: AfterResponseCallback<T>) => {
+    event.context._afterResponse.push(callback);
 };
 
 export const defineCachedCompose = <T, D>(

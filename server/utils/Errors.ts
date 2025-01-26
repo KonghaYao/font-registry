@@ -46,6 +46,11 @@ export class ValidationError extends CustomError {
         super("ValidationError", 412, description, true);
     }
 }
+export class VoidError extends CustomError {
+    constructor(description = "Void cause Error") {
+        super("VoidError", 412, description, true);
+    }
+}
 
 export class NotFoundError extends CustomError {
     constructor(description = "Resource not found") {

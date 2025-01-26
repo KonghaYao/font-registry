@@ -3,6 +3,7 @@ import { defineCompose, EndPoint, WrappedEventHandler } from "../../utils/compos
 import { useJSON, validateQuery } from "../../utils/validation";
 import { ZIPPath } from "../../utils/zip";
 import { hash } from "ohash";
+import { cacheLayer } from "~/server/utils/cache";
 export const schema = z.object({
     /** zip 地址 */
     url: z.string(),
@@ -11,13 +12,8 @@ export const schema = z.object({
 });
 
 // 下载 zip 内的文件
-const api = defineCompose(validateQuery(schema), async (event) => {
+const api = defineCompose(validateQuery(schema), cacheLayer(), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
-    const store = useStorage("cache");
-    const key = "zip:" + hash(params);
-    if (await store.hasItem(key)) {
-        return store.getItemRaw(key);
-    }
     const url = decodeURIComponent(params.url).replace("github.com", "ghproxy.cn/github.com");
     const zip = new ZIPPath(url);
     await zip.cacheFetch();
@@ -27,7 +23,6 @@ const api = defineCompose(validateQuery(schema), async (event) => {
     const data = await zip.getFile(params.path);
     if (!data) throw new NotFoundError();
     setResponseHeader(event, "etag", "W/" + hash(url));
-    await store.setItemRaw(key, data);
     return new Blob([data]);
 });
 type Input = typeof api extends WrappedEventHandler<infer I, unknown> ? I : never;
