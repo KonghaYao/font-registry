@@ -1,5 +1,6 @@
 import { useAfterResponse } from "./compose";
 import { VoidError } from "./Errors";
+import { hash } from "ohash";
 export const cacheLayer =
     (cacheConfig: { getKey?: () => string } = {}): ComposeEventHandler =>
     async (event) => {
@@ -8,7 +9,9 @@ export const cacheLayer =
         if (!key) throw new VoidError("Cache Key is void");
         key = key.replace("?", "_");
         if (await store.hasItem(key)) {
-            return store.getItemRaw(key);
+            const data = await store.getItemRaw(key);
+            setResponseHeader(event, "etag", "W/" + hash(key));
+            return new Blob([data]);
         }
         useAfterResponse(event, async (result) => {
             if (result instanceof Blob) {
