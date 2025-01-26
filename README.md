@@ -9,7 +9,7 @@ Nuxt Server
 | <CDN 采用 Nuxt 的静态稳定地址>
 N * CDN Server
 | <CDN 网关统一转接多个分 CDN 服务>
-CDN_ROOT
-| <前端使用 CDN_ROOT 地址>
+VITE_CDN_ROOT
+| <前端使用 VITE_CDN_ROOT 地址>
 Nuxt Page
 ```
