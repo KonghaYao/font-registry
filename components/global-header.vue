@@ -28,6 +28,12 @@ const userDropdowns = computed(() => [
                 useRouter().push("/cache");
             },
         },
+        {
+            label: "维护日志",
+            click() {
+                useRouter().push("/system/changelog");
+            },
+        },
     ],
     [
         {
