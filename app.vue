@@ -70,6 +70,10 @@ body {
     --el-fill-color-blank: #ffffff;
     --el-border-radius-base: 8px;
 }
+.el-card {
+    --el-card-border-radius: 8px !important;
+    @apply bg-white;
+}
 .el-dialog__header {
     border-bottom: 1px solid #dedede;
     margin-bottom: 1rem;

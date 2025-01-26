@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FormInstance } from "element-plus";
 import { type UnionConfig } from "../composables/interface";
 import { computed } from "vue";
 const props = defineProps<{
@@ -23,10 +24,19 @@ const maxLabelWidth = computed(() => {
         }, 0) * 12
     );
 });
+const formEl = ref<FormInstance>();
+const submitForm = async () => {
+    if (!formEl.value) return;
+    await formEl.value.validate((valid, fields) => {
+        if (valid) {
+            // return submit.fetch(props.modelValue);
+        }
+    });
+};
 </script>
 
 <template>
-    <el-form :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
+    <el-form ref="formEl" :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
         <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
         <el-form-item v-for="item in config" :key="item.value" :label="item.label" :rules="item.rules">
             <el-input v-if="item.type === 'input'" v-model="modelValue[item.value]" :type="item.type" />
@@ -35,9 +45,7 @@ const maxLabelWidth = computed(() => {
             </span>
         </el-form-item>
         <el-form-item class="flex gap-4 mt-3">
-            <el-button type="primary" :loading="submit.loading" @click="() => submit.fetch(props.modelValue)">
-                提交
-            </el-button>
+            <el-button type="primary" :loading="submit.loading" @click="() => submitForm()"> 提交 </el-button>
             <slot name="button"></slot>
             <el-alert v-if="message && submit.loading" :title="message" type="warning" />
         </el-form-item>

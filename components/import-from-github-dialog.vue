@@ -49,7 +49,7 @@ const upload = (data: any) => {
 const magic = useMagicDialog();
 </script>
 <template>
-    <magic-dialog id="import-from-github-dialog" :title="'导入 Github 仓库字体'">
+    <magic-dialog id="import-from-github-dialog" :title="'导入 Github 仓库字体'" min-width="500px">
         <magic-form :config="configs" v-model="model" :submit-action="upload" :message="imported.message">
             <template #button>
                 <el-button @click="magic.toggle('import-from-github-dialog')">关闭</el-button>

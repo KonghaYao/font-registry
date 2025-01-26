@@ -1,9 +1,9 @@
 <template>
     <div class="py-8 flex flex-col gap-4 max-w-xl mx-auto">
-        <u-card class="w-full p-4">
-            <el-row class="mb-4">
+        <el-card class="w-full p-4">
+            <template #header>
                 <div class="font-bold text-2xl">用户信息</div>
-            </el-row>
+            </template>
             <el-row>
                 <el-col :span="24" v-for="item in config" :key="item.name" class="mb-4">
                     <div class="flex justify-between">
@@ -12,20 +12,26 @@
                     </div>
                 </el-col>
             </el-row>
-        </u-card>
-        <u-card class="w-full p-4">
-            <el-row class="mb-4">
-                <div class="font-bold text-2xl">Packages</div>
-            </el-row>
+        </el-card>
+        <el-card class="w-full p-4">
+            <template #header>
+                <div class="flex justify-between">
+                    <div class="font-bold text-2xl">Packages</div>
+                    <el-button @click="useMagicDialog().toggle('import-from-github-dialog')">
+                        从 github 导入
+                    </el-button>
+                </div>
+                <import-from-github-dialog />
+            </template>
             <el-row>
                 <el-col :span="24" v-for="item in packages.data" :key="item.id" class="mb-4">
-                    <a :href="'/packages/' + item.name" class="flex gap-4">
+                    <a :href="'/packages/' + item.name" class="flex gap-4 justify-between">
                         <span class="font-bold">{{ item.name_cn }}</span>
                         <span>{{ item.name }}</span>
                     </a>
                 </el-col>
             </el-row>
-        </u-card>
+        </el-card>
     </div>
 </template>
 
