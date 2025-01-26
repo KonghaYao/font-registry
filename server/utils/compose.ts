@@ -27,9 +27,17 @@ export const defineCompose = <T, D>(
 ): WrappedEventHandler<T, D> => {
     return defineEventHandler(async (event) => {
         for (const handler of args) {
-            const result = await handler(event);
-            if (result) {
-                return result;
+            try {
+                const result = await handler(event);
+                if (result) {
+                    return result;
+                }
+            } catch (e) {
+                if (e instanceof CustomError) {
+                    console.error(e);
+                    throw e.toH3Error();
+                }
+                throw e;
             }
         }
     });
@@ -42,9 +50,17 @@ export const defineCachedCompose = <T, D>(
         /** @ts-ignore */
         defineCachedEventHandler(async (event) => {
             for (const handler of args) {
-                const result = await handler(event);
-                if (result) {
-                    return result;
+                try {
+                    const result = await handler(event);
+                    if (result) {
+                        return result;
+                    }
+                } catch (e) {
+                    if (e instanceof CustomError) {
+                        console.error(e);
+                        throw e.toH3Error();
+                    }
+                    throw e;
                 }
             }
         }, opts);

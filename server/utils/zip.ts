@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 
 export class ZIPPath {
-    static cache = useStorage<ArrayBuffer>("zip-cache");
+    static cache = useStorage<ArrayBuffer>("cache");
     constructor(public url: string) {}
 
     getResult(): Promise<Uint8Array | undefined | null> {
@@ -13,7 +13,10 @@ export class ZIPPath {
     zip: JSZip | undefined;
     async cacheFetch() {
         const cache = await this.getResult();
-        if (cache) return this.getResult();
+        if (cache) {
+            this.zip = await new JSZip().loadAsync(cache);
+            return;
+        }
         const res = await fetch(this.url);
         const blob = new Uint8Array(await res.arrayBuffer());
         this.setResult(blob);

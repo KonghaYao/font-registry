@@ -14,5 +14,4 @@ export default defineCachedCompose(validateQuery(schema), async (event) => {
     return zip.getPaths();
 })({
     maxAge: 30 * 24 * 60 * 60,
-    getKey: (e) => e.path,
 });

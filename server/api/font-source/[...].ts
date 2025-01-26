@@ -1,7 +1,12 @@
 import { hash } from "ohash";
-export default defineCachedCompose(async (event) => {
-    const extra = event.path.split("/font-source/")[1];
+import { NotFoundError } from "~/server/utils/Errors";
 
+export default defineCompose(async (event) => {
+    const extra = event.path.split("/font-source/")[1];
+    const store = useStorage("cache");
+    if (await store.hasItem(extra)) {
+        return store.getItemRaw(extra);
+    }
     const data = await fetch(process.env.OSS_ROOT + "/" + extra).then((res) => {
         if (!res.ok) {
             return null;
@@ -12,13 +17,8 @@ export default defineCachedCompose(async (event) => {
         }
         return res.blob();
     });
-    if (!data) {
-        setResponseStatus(event, 404);
-        return;
-    }
-    console.log("hit");
+    if (!data) throw new NotFoundError();
+    await store.setItemRaw(extra, new Uint8Array(await data.arrayBuffer()));
     setResponseHeader(event, "etag", "W/" + hash(extra));
     return data;
-})({
-    maxAge: 24 * 60 * 60,
 });

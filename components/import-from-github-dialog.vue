@@ -4,7 +4,7 @@ import type { InputSchema } from "~/server/api/import-from-github";
 const imported = useAsyncSSEJSON<InputSchema, { code: 0 }, string>(
     (data) => {
         return {
-            url: "/api/import-from-github2",
+            url: "/api/import-from-github",
             method: "post",
             body: data,
         };

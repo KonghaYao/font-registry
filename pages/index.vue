@@ -8,11 +8,9 @@ const handlePrebuild = () => prebuild.fetch({ name: "atelier-anchor/smiley-sans"
 
 <template>
     <div>{{ user?.email }}</div>
-    <button @click="handlePrebuild">
-        {{ prebuild.loading ? 1 : 0 }}
-    </button>
+    <el-button :loading="prebuild.loading" @click="handlePrebuild"> 预构建字体 </el-button>
 
-    <button @click="useMagicDialog().toggle('import-from-github-dialog')">导入 github 字体</button>
+    <el-button @click="useMagicDialog().toggle('import-from-github-dialog')">导入 github 字体</el-button>
 
     <import-from-github-dialog />
 </template>

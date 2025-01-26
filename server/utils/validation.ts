@@ -8,10 +8,7 @@ export const validateJSON =
     async (event) => {
         const body = await readValidatedBody(event, schema.safeParse);
         if (!body.data) {
-            return createError({
-                statusCode: 400,
-                statusMessage: "Invalid body",
-            });
+            throw new ValidationError("Invalid JSON body");
         }
         event.context.json = body.data!;
     };
@@ -21,10 +18,7 @@ export const validateQuery =
     async (event) => {
         const body = await getValidatedQuery(event, schema.safeParse);
         if (!body.data) {
-            return createError({
-                statusCode: 400,
-                statusMessage: "Invalid query params",
-            });
+            throw new ValidationError("Invalid QueryParams");
         }
         event.context.json = body.data!;
     };

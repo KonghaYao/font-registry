@@ -7,6 +7,7 @@ import { defineCompose } from "../utils/compose";
 import { authRunner, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
 import { sseResponse, useSSE } from "../utils/useSSE";
+import { useSupabaseQuery } from "../utils/Errors";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
@@ -32,26 +33,23 @@ export default defineCompose(
         });
         sse.log("找到 github 仓库 " + repo.data.full_name);
 
-        const author = await client
-            .from("authors")
-            .upsert(
-                [
-                    {
-                        name: repo.data.owner.login,
-                        name_cn: repo.data.owner.login || repo.data.owner.name,
-                        avatar: repo.data.owner.avatar_url,
-                        link: repo.data.owner.html_url,
-                    },
-                ],
-                { onConflict: "name" }
-            )
-            .select();
-        if (author.error) {
-            return createError({
-                statusCode: 400,
-                statusMessage: author.error.message,
-            });
-        }
+        const author = useSupabaseQuery(
+            await client
+                .from("authors")
+                .upsert(
+                    [
+                        {
+                            name: repo.data.owner.login,
+                            name_cn: repo.data.owner.login || repo.data.owner.name,
+                            avatar: repo.data.owner.avatar_url,
+                            link: repo.data.owner.html_url,
+                        },
+                    ],
+                    { onConflict: "name" }
+                )
+                .select()
+        );
+
         sse.log("找到 author  " + author.data[0].name);
 
         const readme = await octokit.repos.getReadme({
@@ -61,33 +59,29 @@ export default defineCompose(
 
         sse.log("找到 Readme 文件  " + readme.data.path);
 
-        const pack = await client
-            .from("packages")
-            .upsert(
-                [
-                    {
-                        name: repo.data.full_name,
-                        description: repo.data.description,
-                        homepage: repo.data.homepage || repo.data.html_url,
-                        keywords: repo.data.topics || [],
-                        readme: readme.data.content,
-                        latest: "",
-                        name_cn: params.name_cn,
-                        license: repo.data.license?.name,
-                        user_id: userId,
-                        from: "github_api",
-                        author: author.data[0].id,
-                    },
-                ],
-                { onConflict: "name" }
-            )
-            .select();
-        if (pack.error) {
-            return createError({
-                statusCode: 400,
-                statusMessage: pack.error.message,
-            });
-        }
+        const pack = useSupabaseQuery(
+            await client
+                .from("packages")
+                .upsert(
+                    [
+                        {
+                            name: repo.data.full_name,
+                            description: repo.data.description,
+                            homepage: repo.data.homepage || repo.data.html_url,
+                            keywords: repo.data.topics || [],
+                            readme: readme.data.content,
+                            latest: "",
+                            name_cn: params.name_cn,
+                            license: repo.data.license?.name,
+                            user_id: userId,
+                            from: "github_api",
+                            author: author.data[0].id,
+                        },
+                    ],
+                    { onConflict: "name" }
+                )
+                .select()
+        );
         const pId = pack.data[0].id;
         sse.log(`导入 github packages 成功  ${pId} ${pack.data[0].name_cn}`);
 
@@ -108,14 +102,12 @@ export default defineCompose(
             .eq("id", pId)
             .select();
 
-        const versionResult = await client
-            .from("versions")
-            .upsert(dataList as any, { onConflict: "package_id,version" })
-            .select();
-
-        if (versionResult.error) {
-            return createError({ statusCode: 400, statusMessage: versionResult.error.message });
-        }
+        const versionResult = useSupabaseQuery(
+            await client
+                .from("versions")
+                .upsert(dataList as any, { onConflict: "package_id,version" })
+                .select()
+        );
         sse.log(`导入 github release ${versionResult.data.length} 个`);
 
         const assets = (
@@ -160,18 +152,15 @@ export default defineCompose(
         ).flat();
 
         // 注入资源表
-        const assetsInsert = await client
-            .from("assets")
-            .upsert(assets as any, {
-                onConflict: "version_id,assets_name",
-            })
-            .select();
+        const assetsInsert = useSupabaseQuery(
+            await client
+                .from("assets")
+                .upsert(assets as any, {
+                    onConflict: "version_id,assets_name",
+                })
+                .select()
+        );
         sse.log(`导入 github assets ${assetsInsert.data?.length} 个`);
-        if (assetsInsert.error)
-            return createError({
-                statusCode: 400,
-                statusMessage: assetsInsert.error.message,
-            });
         return {
             package: pack.data[0],
             version: versionResult.data,

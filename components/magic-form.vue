@@ -39,7 +39,7 @@ const maxLabelWidth = computed(() => {
                 提交
             </el-button>
             <slot name="button"></slot>
-            <el-alert v-if="message" :title="message" type="warning" />
+            <el-alert v-if="message && submit.loading" :title="message" type="warning" />
         </el-form-item>
     </el-form>
 </template>

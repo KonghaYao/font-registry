@@ -26,6 +26,9 @@ importers:
       '@octokit/rest':
         specifier: ^21.1.0
         version: 21.1.0
+      '@supabase/postgrest-js':
+        specifier: ^1.17.10
+        version: 1.17.10
       '@vueuse/core':
         specifier: ^12.3.0
         version: 12.3.0(typescript@5.7.3)

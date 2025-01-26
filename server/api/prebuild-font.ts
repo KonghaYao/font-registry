@@ -5,6 +5,7 @@ import { decodeReporter } from "cn-font-split/dist/createAPI";
 import { defineCompose } from "../utils/compose";
 import { authRunner, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
+import { useSupabaseQuery } from "../utils/Errors";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
@@ -15,24 +16,35 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
     const body: z.infer<typeof schema> = useJSON(event);
     const client = serverSupabaseServiceRole<Database>(event);
     const key = body.name;
-    const pkg = await client.from("packages").select("id,latest,style,name").eq("name", key).single();
-    if (!pkg.data) return createError("Package not found");
+    const pkg = useSupabaseQuery(await client.from("packages").select("id,latest,style,name").eq("name", key).single());
 
     const style = pkg.data.style;
     // @ts-ignore
     if (!style || style.version !== pkg.data.latest || body.force) {
-        const version = await client
-            .from("versions")
-            .select("*")
-            .eq("package_id", pkg.data.id)
-            .eq("version", pkg.data.latest)
-            .single();
-        if (!version.data) return createError("Version not found");
+        const version = useSupabaseQuery(
+            await client
+                .from("versions")
+                .select("*")
+                .eq("package_id", pkg.data.id)
+                .eq("version", pkg.data.latest)
+                .single()
+        );
 
-        const assets = await client.from("assets").select("*").eq("version_id", version.data.id).select();
-        const asset = assets.data?.[0];
-        if (!asset) return createError("Asset not found");
-
+        const assets = useSupabaseQuery(
+            await client
+                .from("assets")
+                .select("*")
+                .eq("version_id", version.data.id)
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .single(),
+            (res) => {
+                if (!res.data) {
+                    throw new NotFoundError("Asset not found");
+                }
+            }
+        );
+        const asset = assets.data;
         const file_folder = (
             "/packages/" +
             key +
@@ -42,7 +54,8 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             asset.assets_name +
             "/"
         ).replaceAll(".", "_");
-        console.log(asset.download_url);
+        const file_url = new URL(asset.download_url, process.env.WEBSITE_URL).toString();
+        console.log(file_url);
         await fetch(process.env.SPLIT_SERVER + "/upload", {
             method: "POST",
             headers: {
@@ -51,7 +64,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                file_url: new URL(asset.download_url, process.env.WEBSITE_URL),
+                file_url,
                 file_folder,
             }),
         })
@@ -63,6 +76,7 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
         console.log("构建完成", file_folder);
 
         const bin = await fetch(process.env.OSS_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
+
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
             version: version.data.version,
@@ -70,14 +84,11 @@ export default defineCompose(authRunner, validateJSON(schema), async (event) => 
             file_folder,
             ...reporter.css.toObject(),
         };
-        const { error } = await client.from("packages").update({ style }).eq("id", pkg.data.id).select();
-        if (error) throw error;
-        const restoreAsset = await client
-            .from("assets")
-            .update({ is_published: true, style })
-            .eq("id", asset.id)
-            .select();
-        if (restoreAsset.error) throw restoreAsset.error;
+        useSupabaseQuery(await client.from("packages").update({ style }).eq("id", pkg.data.id).select());
+
+        const restoreAsset = useSupabaseQuery(
+            await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select()
+        );
         return style;
     }
     return style;

@@ -17,6 +17,7 @@
         "@nuxtjs/mdc": "^0.13.0",
         "@nuxtjs/supabase": "^1.4.5",
         "@octokit/rest": "^21.1.0",
+        "@supabase/postgrest-js": "^1.17.10",
         "@vueuse/core": "^12.3.0",
         "@vueuse/nuxt": "^12.3.0",
         "cn-font-split": "^7.2.1",

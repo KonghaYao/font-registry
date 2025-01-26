@@ -22,12 +22,12 @@ onMounted(() => {
     <u-card>
         <div class="flex gap-4">
             <span> cache 缓存管理 </span>
-            <u-button @click="cacheList.fetch(null)">刷新</u-button>
-            <u-button @click="deleteCache()">删除全部</u-button>
+            <el-button :loading="cacheList.loading" @click="cacheList.fetch(null)">刷新</el-button>
+            <el-button :loading="deleteAction.loading" @click="deleteCache()">删除全部</el-button>
         </div>
         <ul class="flex flex-col gap-2">
             <li v-for="cacheKey in cacheList.data" class="flex gap-4">
-                <u-button @click="deleteCache(cacheKey)">删除</u-button>
+                <el-button :loading="deleteAction.loading" @click="deleteCache(cacheKey)">删除</el-button>
                 <div>
                     {{ cacheKey }}
                 </div>
