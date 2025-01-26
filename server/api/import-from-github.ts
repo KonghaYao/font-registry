@@ -4,7 +4,7 @@ import { serverSupabaseClient, serverSupabaseServiceRole } from "#supabase/serve
 import { RestEndpointMethodTypes } from "@octokit/rest";
 import { Database } from "~/types/database.types";
 import { defineCompose } from "../utils/compose";
-import { authRunner, useUser } from "../utils/auth";
+import { authLayer, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
 import { sseResponse, useSSE } from "../utils/useSSE";
 import { useSupabaseQuery } from "../utils/Errors";
@@ -17,7 +17,7 @@ export const schema = z.object({
 
 /** 从 github 更新数据 */
 export default defineCompose(
-    authRunner,
+    authLayer,
     validateJSON(schema),
     sseResponse(async (event) => {
         const sse = useSSE(event);

@@ -3,7 +3,7 @@ import { ComposeEventHandler } from "./compose";
 import type { H3Event } from "h3";
 
 /** 权限验证中间件 **/
-export const authRunner: ComposeEventHandler = async (event) => {
+export const authLayer: ComposeEventHandler = async (event) => {
     const user = await serverSupabaseUser(event);
     if (!user)
         return createError({
