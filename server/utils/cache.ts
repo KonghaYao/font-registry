@@ -4,8 +4,9 @@ export const cacheLayer =
     (cacheConfig: { getKey?: () => string } = {}): ComposeEventHandler =>
     async (event) => {
         const store = useStorage("cache");
-        const key = cacheConfig.getKey?.() ?? event.node.req.url!;
+        let key = cacheConfig.getKey?.() ?? event.node.req.originalUrl!;
         if (!key) throw new VoidError("Cache Key is void");
+        key = key.replace("?", "_");
         if (await store.hasItem(key)) {
             return store.getItemRaw(key);
         }

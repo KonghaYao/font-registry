@@ -12,7 +12,6 @@ const links = [
         to: "/packages",
     },
 ];
-
 const userDropdowns = computed(() => [
     [
         {
