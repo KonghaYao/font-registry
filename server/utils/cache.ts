@@ -1,6 +1,7 @@
 import { useAfterResponse } from "./compose";
 import { VoidError } from "./Errors";
 import { hash } from "ohash";
+
 export const cacheLayer =
     (cacheConfig: { getKey?: () => string } = {}): ComposeEventHandler =>
     async (event) => {
@@ -10,8 +11,12 @@ export const cacheLayer =
         key = key.replace("?", "_");
         if (await store.hasItem(key)) {
             const data = await store.getItemRaw(key);
-            setResponseHeader(event, "etag", "W/" + hash(key));
-            return new Blob([data]);
+            if (data instanceof Uint8Array) {
+                setResponseHeader(event, "etag", "W/" + hash(key));
+                return new Blob([data]);
+            } else {
+                return data;
+            }
         }
         useAfterResponse(event, async (result) => {
             if (result instanceof Blob) {
