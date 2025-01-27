@@ -10,6 +10,7 @@ export interface AsyncEvent<Input, Output, Message = Output> {
     onSuccess?: (data: Output, input: Input) => void;
     /** sse 才能实现 */
     onReceive?: (data: Message, input: Input) => void;
+    cache?: () => RequestInit["cache"];
 }
 
 export type ActionType = Awaited<ReturnType<typeof useAsyncAction>>;
@@ -52,6 +53,12 @@ export function useAsyncJSON<Input, Output, Message = Output>(
     fn: (input: Input) => RequestType<Input> | Promise<RequestType<Input>>,
     events?: AsyncEvent<Input, Output, Message>
 ) {
+    events = events || {};
+    events.onError =
+        events.onError ||
+        ((err) => {
+            ElMessage.error("请求失败: " + err.message);
+        });
     return useAsyncAction<Input, Output, Message>(async (input) => {
         const data = await fn(input);
         data.body = data.body ?? input;
@@ -62,6 +69,7 @@ export function useAsyncJSON<Input, Output, Message = Output>(
             headers: {
                 "Content-Type": data.method === "post" ? "application/json" : "",
             },
+            cache: events?.cache?.(),
             params: data.method === "get" ? (data.body as any) : undefined,
             body: data.method === "post" ? JSON.stringify(data.body) : undefined,
             server: false,

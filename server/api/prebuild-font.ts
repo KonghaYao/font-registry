@@ -9,6 +9,8 @@ import { useSupabaseQuery } from "../utils/Errors";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
+    version: z.optional(z.string()),
+    assets_name: z.optional(z.string()),
     force: z.optional(z.boolean()),
 });
 
@@ -19,25 +21,26 @@ export default defineCompose(authLayer, validateJSON(schema), async (event) => {
     const pkg = useSupabaseQuery(await client.from("packages").select("id,latest,style,name").eq("name", key).single());
 
     const style = pkg.data.style;
+    const isAccurate = body.version && body.assets_name;
     // @ts-ignore
-    if (!style || style.version !== pkg.data.latest || body.force) {
+    if (!style || style.version !== pkg.data.latest || body.force || isAccurate) {
         const version = useSupabaseQuery(
             await client
                 .from("versions")
                 .select("*")
                 .eq("package_id", pkg.data.id)
-                .eq("version", pkg.data.latest)
+                .eq("version", body.version ?? pkg.data.latest)
                 .single()
         );
+        const chain = client
+            .from("assets")
+            .select("*")
+            .eq("version_id", version.data.id)
+            .order("created_at", { ascending: false })
+            .limit(1);
 
         const assets = useSupabaseQuery(
-            await client
-                .from("assets")
-                .select("*")
-                .eq("version_id", version.data.id)
-                .order("created_at", { ascending: false })
-                .limit(1)
-                .single(),
+            await (isAccurate ? chain.eq("assets_name", body.assets_name!).single() : chain.single()),
             (res) => {
                 if (!res.data) {
                     throw new NotFoundError("Asset not found");
@@ -76,7 +79,6 @@ export default defineCompose(authLayer, validateJSON(schema), async (event) => {
         console.log("构建完成", file_folder);
 
         const bin = await fetch(process.env.OSS_ROOT + file_folder + "reporter.bin").then((res) => res.arrayBuffer());
-
         const reporter = decodeReporter(new Uint8Array(bin));
         const style = {
             version: version.data.version,
@@ -84,7 +86,8 @@ export default defineCompose(authLayer, validateJSON(schema), async (event) => {
             file_folder,
             ...reporter.css.toObject(),
         };
-        useSupabaseQuery(await client.from("packages").update({ style }).eq("id", pkg.data.id).select());
+        if (!isAccurate)
+            useSupabaseQuery(await client.from("packages").update({ style }).eq("id", pkg.data.id).select());
 
         useSupabaseQuery(await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select());
         return style;

@@ -1,10 +1,27 @@
 <script lang="ts" setup>
 import prettyBytes from "pretty-bytes";
 import type VersionList from "#server-endpoint/api/version/list.ts";
+import type PreBuild from "#server-endpoint/api/prebuild-font.ts";
 const props = defineProps<{
     pkgId: number;
     pkgName: string;
 }>();
+
+const prebuild = useAsyncJSON<PreBuild.Input, PreBuild.Output>(
+    () => ({
+        url: "/api/prebuild-font",
+        method: "post",
+    }),
+    {
+        onSuccess(data, input) {
+            isNeedForceRefresh.value = true;
+            allVersions.fetch({ pkgId: props.pkgId.toString() }).then(() => {
+                isNeedForceRefresh.value = false;
+            });
+        },
+    }
+);
+let isNeedForceRefresh = ref(false);
 const allVersions = useAsyncJSON<VersionList.Input, VersionList.Output>(
     async () => {
         return {
@@ -15,15 +32,18 @@ const allVersions = useAsyncJSON<VersionList.Input, VersionList.Output>(
         onSuccess(data) {
             console.log(data);
         },
+        cache() {
+            return isNeedForceRefresh.value ? "no-cache" : undefined;
+        },
     }
 );
 const { copy } = useCopyToClipboard();
 onMounted(() => {
-    allVersions.fetch({ pkgId: props.pkgId });
+    allVersions.fetch({ pkgId: props.pkgId.toString() });
 });
 defineExpose({
     fetch() {
-        !allVersions.data && allVersions.fetch({ pkgId: props.pkgId });
+        !allVersions.data && allVersions.fetch({ pkgId: props.pkgId.toString() });
     },
 });
 </script>
@@ -78,10 +98,17 @@ defineExpose({
                     </div>
                     <div
                         class="text-purple-800/50 cursor-pointer"
-                        @click="() => {
-                            copy(createFontLink(pkgName, item.version!, asset.assets_name))
-                            ElMessage.success('复制成功');
-                        }"
+                        v-loading="prebuild.loading"
+                        @click="
+                            () => {
+                                ElMessage.success('构建中，请稍等');
+                                prebuild.fetch({
+                                    name: pkgName,
+                                    version: item.version,
+                                    assets_name: asset.assets_name,
+                                });
+                            }
+                        "
                         v-else
                     >
                         <UIcon name="vscode-icons:file-type-css" class="w-5 h-5" />

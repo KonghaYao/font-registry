@@ -19,7 +19,6 @@ export const cacheLayer =
             const data = await store.getItemRaw(key);
             setResponseHeader(event, "x-server-cache", "hit");
             setResponseHeader(event, "etag", "W/" + hash(key));
-            console.log(key, data);
             if (data instanceof Uint8Array || data instanceof ArrayBuffer) {
                 return new Blob([data]);
             } else {
