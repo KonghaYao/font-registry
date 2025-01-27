@@ -56,6 +56,7 @@ const packages = useAsyncAction(async () => {
     return data;
 });
 onMounted(() => {
+    console.log(user);
     packages.fetch(null);
 });
 </script>

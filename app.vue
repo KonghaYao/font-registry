@@ -89,4 +89,12 @@ body {
         height: calc(100vh - 65px);
     }
 }
+.page-enter-active,
+.page-leave-active {
+    transition: opacity 1.5s;
+}
+.page-enter,
+.page-leave-active {
+    opacity: 0;
+}
 </style>
