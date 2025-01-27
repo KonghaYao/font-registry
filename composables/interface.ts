@@ -6,5 +6,5 @@ export interface UnionConfig {
     type?: "input";
     /** 纯文本展示转化 */
     display?: (value: string) => string;
-    rules?: Arrayable<FormItemRule>;
+    rules?: Array<FormItemRule>;
 }

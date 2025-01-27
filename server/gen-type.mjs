@@ -60,7 +60,6 @@ function genServerEndPointType(sourceFile, checker) {
     if (!defaultExportType) {
         return "";
     }
-
     // 构建 .d.ts 内容
     const name = "#server-endpoint/" + path.relative(basePath, sourceFile.path).replaceAll("\\", "/");
     const dtsContent = `

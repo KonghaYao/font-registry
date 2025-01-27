@@ -30,6 +30,8 @@ const submitForm = async () => {
     await formEl.value.validate((valid, fields) => {
         if (valid) {
             return submit.fetch(props.modelValue);
+        } else {
+            ElMessage.warning("请填写完整信息");
         }
     });
 };
@@ -38,7 +40,13 @@ const submitForm = async () => {
 <template>
     <el-form ref="formEl" :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
         <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
-        <el-form-item v-for="item in config" :key="item.value" :label="item.label" :rules="item.rules">
+        <el-form-item
+            v-for="item in config"
+            :key="item.value"
+            :prop="item.value"
+            :label="item.label"
+            :rules="item.rules"
+        >
             <el-input v-if="item.type === 'input'" v-model="modelValue[item.value]" :type="item.type" />
             <span v-else>
                 {{ showValue(modelValue[item.value], item) }}
