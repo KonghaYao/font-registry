@@ -86,9 +86,7 @@ export default defineCompose(authLayer, validateJSON(schema), async (event) => {
         };
         useSupabaseQuery(await client.from("packages").update({ style }).eq("id", pkg.data.id).select());
 
-        const restoreAsset = useSupabaseQuery(
-            await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select()
-        );
+        useSupabaseQuery(await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select());
         return style;
     }
     return style;
