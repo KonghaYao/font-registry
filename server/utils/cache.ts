@@ -13,14 +13,14 @@ export const cacheLayer =
         const store = useStorage("cache");
         let key = cacheConfig.getKey?.() ?? event.node.req.originalUrl!;
         if (!key) throw new VoidError("Cache Key is void");
-        key = key.replaceAll("?", "_").replaceAll("/", "_");
+        key = key.replaceAll("?", "_").replaceAll("/", "_").replaceAll("=", "_");
         if (cacheConfig.before) await cacheConfig.before(event);
         if (await store.hasItem(key)) {
             const data = await store.getItemRaw(key);
             setResponseHeader(event, "x-server-cache", "hit");
             setResponseHeader(event, "etag", "W/" + hash(key));
             console.log(key, data);
-            if (data instanceof Uint8Array) {
+            if (data instanceof Uint8Array || data instanceof ArrayBuffer) {
                 return new Blob([data]);
             } else {
                 return data;
