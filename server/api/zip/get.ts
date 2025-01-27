@@ -26,7 +26,7 @@ const api = defineCompose(
         const url = decodeURIComponent(params.url);
         const zip = new ZIPPath(url);
         await zip.cacheFetch();
-        const data = await zip.getFile(params.path);
+        const data = await zip.getFile(decodeURIComponent(params.path));
         if (!data) throw new NotFoundError();
         return new Blob([data]);
     }

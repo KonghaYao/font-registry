@@ -15,5 +15,4 @@ onMounted(() => {
 
 <template>
     <div>{{ user?.email }}</div>
-    <el-button :loading="prebuild.loading" @click="handlePrebuild"> 预构建字体 </el-button>
 </template>

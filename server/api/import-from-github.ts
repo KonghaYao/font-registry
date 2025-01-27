@@ -1,6 +1,7 @@
 import { octokit } from "../utils/github-endpoint";
 import z from "zod";
-import { serverSupabaseClient, serverSupabaseServiceRole } from "#supabase/server";
+import { uniqBy } from "lodash-es";
+import { serverSupabaseServiceRole } from "#supabase/server";
 import { RestEndpointMethodTypes } from "@octokit/rest";
 import { Database } from "~/types/database.types";
 import { defineCompose } from "../utils/compose";
@@ -115,7 +116,7 @@ export default defineCompose(
                 response.data.map(async (release, index) => {
                     let zipFiles: any[] = [];
                     let assetIds = release.assets.filter((i) => {
-                        if (i.content_type === "application/zip") zipFiles.push(i);
+                        if (i.content_type === "application/zip" || i.name.endsWith(".zip")) zipFiles.push(i);
                         return (
                             i.state === "uploaded" &&
                             (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
@@ -123,34 +124,35 @@ export default defineCompose(
                     });
 
                     for (const zipFile of zipFiles) {
-                        console.log(zipFile.browser_download_url);
                         const zip = new ZIPPath(zipFile.browser_download_url);
                         await zip.cacheFetch();
                         const filePaths = zip.getPaths();
                         filePaths.forEach((path) => {
                             if (["otf", "ttf"].some((ext) => path.endsWith(ext))) {
                                 assetIds.push({
-                                    name: path.split("/")[1] || path,
+                                    name: path, // 这里可能有导致 url 不能使用的情况
                                     browser_download_url: `/api/zip/get?url=${encodeURIComponent(
                                         zipFile.browser_download_url
-                                    )}&path=${path}`,
+                                    )}&path=${encodeURIComponent(path)}`,
                                     size: zip.getFileSize(path),
                                 } as any);
                             }
                         });
                     }
 
-                    return assetIds.map((asset) => ({
-                        version_id: versionResult.data[index].id,
-                        assets_name: asset.name,
-                        size: asset.size,
-                        download_url: asset.browser_download_url,
-                        user_id: userId,
-                    }));
+                    return uniqBy(
+                        assetIds.map((asset) => ({
+                            version_id: versionResult.data[index].id,
+                            assets_name: asset.name,
+                            size: asset.size,
+                            download_url: asset.browser_download_url,
+                            user_id: userId,
+                        })),
+                        (i) => i.assets_name
+                    );
                 })
             )
         ).flat();
-
         // 注入资源表
         const assetsInsert = useSupabaseQuery(
             await client
