@@ -29,7 +29,7 @@ const submitForm = async () => {
     if (!formEl.value) return;
     await formEl.value.validate((valid, fields) => {
         if (valid) {
-            // return submit.fetch(props.modelValue);
+            return submit.fetch(props.modelValue);
         }
     });
 };

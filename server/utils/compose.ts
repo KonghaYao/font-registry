@@ -9,7 +9,7 @@ export interface WrappedEventHandler<Input = unknown, Response extends EventHand
 
 export interface ComposeEventHandler<
     /** 入参，给前端自动生成 */
-    Input = unknown,
+    Input = null,
     /** 出参，给前端自动生成 */
     Response extends EventHandlerResponse = EventHandlerResponse,
     Request extends EventHandlerRequest = EventHandlerRequest
@@ -54,7 +54,7 @@ export const useAfterResponse = <T>(event: H3Event, callback: AfterResponseCallb
 
 export const defineCachedCompose = <T, D>(
     ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
-) => {
+): ((opts: any) => WrappedEventHandler<T, D>) => {
     return (opts: Parameters<typeof defineCachedEventHandler>[1]): WrappedEventHandler<T, D> =>
         /** @ts-ignore */
         defineCachedEventHandler(async (event) => {

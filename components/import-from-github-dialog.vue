@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useMagicDialog } from "~/composables/useMagicDialog";
-import type { InputSchema } from "~/server/api/import-from-github";
-const imported = useAsyncSSEJSON<InputSchema, { code: 0 }, string>(
+import type Import from "#server-endpoint/api/import-from-github.ts";
+const imported = useAsyncSSEJSON<Import.Input, Import.Output, string>(
     (data) => {
         return {
             url: "/api/import-from-github",

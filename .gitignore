@@ -25,3 +25,4 @@ logs
 core.*
 
 .netlify
+types/server-type.d.ts

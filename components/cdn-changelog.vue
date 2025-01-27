@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { data } = await useFetch("/api/system/cdn-changelog");
+import type Changelog from "#server-endpoint/api/system/cdn-changelog.ts";
+const { data } = await useFetch<Changelog.Output>("/api/system/cdn-changelog");
 </script>
 
 <template>
@@ -11,13 +12,13 @@ const { data } = await useFetch("/api/system/cdn-changelog");
             <li class="my-2" v-for="item in data">
                 <div class="flex justify-between my-2">
                     <span>
-                        {{ item.user.login }}
+                        {{ item.user?.login }}
                     </span>
                     <span>
                         {{ new Date(item.created_at).toLocaleString() }}
                     </span>
                 </div>
-                <MDC :value="item.body" tag="div"></MDC>
+                <MDC :value="item.body || ''" tag="div"></MDC>
             </li>
         </ul>
     </el-card>

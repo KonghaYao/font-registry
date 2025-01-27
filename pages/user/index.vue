@@ -51,7 +51,7 @@ const config = computed(() => [
 
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    const { data, error } = await client.from("packages").select("name_cn,name").eq("user_id", user.value?.id!);
+    const { data, error } = await client.from("packages").select("name_cn,name,id").eq("user_id", user.value?.id!);
     if (error) throw error;
     return data;
 });

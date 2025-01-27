@@ -25,6 +25,4 @@ const api = defineCompose(validateQuery(schema), cacheLayer(), async (event) => 
     setResponseHeader(event, "etag", "W/" + hash(url));
     return new Blob([data]);
 });
-type Input = typeof api extends WrappedEventHandler<infer I, unknown> ? I : never;
-type Output = typeof api extends WrappedEventHandler<unknown, infer O> ? O : never;
 export default api;

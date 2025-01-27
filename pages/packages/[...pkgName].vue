@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import "github-markdown-css/github-markdown.css";
 import { createFontLink } from "~/composables/useFont";
+import type PackageType from "#server-endpoint/api/packages/get.ts";
 definePageMeta({
     layout: "packages",
 });
@@ -11,7 +12,7 @@ const pkgName = route.params.pkgName as string[];
 const pkgKey = pkgName.join("/");
 const urlConfig = reactive({ a: "", img: "" });
 provide("mdc-base-url", urlConfig);
-const pkgDetail = await useFetch("/api/packages/get?pkgKey=" + pkgKey);
+const pkgDetail = await useFetch<PackageType.Output>("/api/packages/get?pkgKey=" + pkgKey);
 if (pkgDetail.data.value?.from === "github_api") {
     Object.assign(urlConfig, {
         a: "https://github.com/" + pkgKey + "/",
@@ -37,9 +38,9 @@ useHead({
     link: [
         {
             href: createFontLink(
-                pkgDetail.data?.value.name,
-                pkgDetail.data?.value.latest,
-                fontInfoOfStyle?.value.file_name
+                pkgDetail.data.value?.name!,
+                pkgDetail.data.value?.latest!,
+                fontInfoOfStyle.value.file_name
             ),
             rel: "stylesheet",
         },

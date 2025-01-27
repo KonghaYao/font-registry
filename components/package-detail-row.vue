@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type PackageType from "#server-endpoint/api/packages/get.ts";
 defineProps<{
-    pack: any;
+    pack: PackageType.Output;
 }>();
 </script>
 

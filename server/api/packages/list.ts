@@ -1,5 +1,5 @@
 import z from "zod";
-import { ComposeEventHandler, defineCachedCompose, EndPoint, WrappedEventHandler } from "../../utils/compose";
+import { defineCachedCompose } from "../../utils/compose";
 import { validateQuery, useJSON } from "../../utils/validation";
 import { serverSupabaseServiceRole } from "#supabase/server";
 export const schema = z.object({

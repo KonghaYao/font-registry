@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { debounce } from "lodash";
+import type List from "#server-endpoint/api/packages/list.ts";
 const state = ref("");
 const querySearch = debounce((queryString: string, cb: any) => {
     fetch("/api/packages/list?query=" + queryString)
         .then((res) => res.json())
         .then((res) => {
-            cb(res.data);
+            cb(res.data as List.Output);
         });
 }, 300);
 const handleSelect = (item: Record<string, any>) => {

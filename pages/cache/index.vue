@@ -1,10 +1,12 @@
 <script setup lang="ts">
-const cacheList = useAsyncJSON(async () => {
+import type List from "#server-endpoint/api/cache/list.ts";
+import type Clear from "#server-endpoint/api/cache/clear.ts";
+const cacheList = useAsyncJSON<List.Input, List.Output>(async () => {
     return {
         url: "/api/cache/list",
     };
 });
-const deleteAction = useAsyncJSON(async () => {
+const deleteAction = useAsyncJSON<Clear.Input, Clear.Output>(async () => {
     return {
         url: "/api/cache/clear",
         method: "post",
@@ -19,7 +21,7 @@ onMounted(() => {
 });
 const filterText = ref("");
 const filteredList = computed(() => {
-    if (!filterText.value) return cacheList.data;
+    if (!filterText.value) return cacheList.data!;
     return cacheList.data?.filter((item) => item.includes(filterText.value)) || [];
 });
 </script>

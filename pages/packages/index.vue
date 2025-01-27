@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type List from "#server-endpoint/api/packages/list.ts";
 definePageMeta({
     layout: "packages",
 });
-const PackagesData = useAsyncJSON<{ query?: string }, any>(() => {
+const PackagesData = useAsyncJSON<List.Input, List.Output>(() => {
     return {
         url: "/api/packages/list",
     };

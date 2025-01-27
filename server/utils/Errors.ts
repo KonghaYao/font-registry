@@ -41,6 +41,12 @@ export class CustomError extends Error {
     }
 }
 
+export class AuthorizationError extends CustomError {
+    constructor(description = "Unauthorized") {
+        super("AuthorizationError", 401, description, true);
+    }
+}
+
 export class ValidationError extends CustomError {
     constructor(description = "Invalid query or body") {
         super("ValidationError", 412, description, true);

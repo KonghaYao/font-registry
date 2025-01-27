@@ -1,15 +1,12 @@
 import { serverSupabaseUser } from "#supabase/server";
 import { ComposeEventHandler } from "./compose";
 import type { H3Event } from "h3";
+import { AuthorizationError } from "./Errors";
 
 /** 权限验证中间件 **/
 export const authLayer: ComposeEventHandler = async (event) => {
     const user = await serverSupabaseUser(event);
-    if (!user)
-        return createError({
-            statusCode: 400,
-            statusMessage: "ID should be an integer",
-        });
+    if (!user) throw new AuthorizationError();
     event.context.user = user;
 };
 
