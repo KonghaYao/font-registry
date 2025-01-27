@@ -18,6 +18,7 @@ export const cacheLayer =
         if (await store.hasItem(key)) {
             const data = await store.getItemRaw(key);
             if (data instanceof Uint8Array) {
+                setResponseHeader(event, "x-server-cache", "hit");
                 setResponseHeader(event, "etag", "W/" + hash(key));
                 return new Blob([data]);
             } else {
@@ -26,6 +27,8 @@ export const cacheLayer =
         }
         useAfterResponse(event, async (result) => {
             if (result instanceof Blob) {
+                setResponseHeader(event, "x-server-cache", "miss");
+                setResponseHeader(event, "etag", "W/" + hash(key));
                 return store.setItemRaw(key, new Uint8Array(await result.arrayBuffer()));
             }
             return store.setItemRaw(key, result);

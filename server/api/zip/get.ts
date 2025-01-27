@@ -17,10 +17,8 @@ const api = defineCompose(
     cacheLayer({
         before(event) {
             const params: z.infer<typeof schema> = useJSON(event);
-            const url = decodeURIComponent(params.url);
             setResponseHeader(event, "Content-Type", "application/octet-stream");
             setResponseHeader(event, "Content-Disposition", `attachment; filename=${params.path.split("/").at(-1)}`);
-            setResponseHeader(event, "etag", "W/" + hash(url));
         },
     }),
     async (event) => {
