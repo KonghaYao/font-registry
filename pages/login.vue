@@ -7,11 +7,12 @@ watchEffect(() => {
         navigateTo("/");
     }
 });
+const location = useBrowserLocation();
 const githubLogin = () => {
     return auth.signInWithOAuth({
         provider: "github",
         options: {
-            redirectTo: new URL("/", location.href).toString(),
+            redirectTo: new URL("/", location.value.href).toString(),
         },
     });
 };
