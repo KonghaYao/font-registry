@@ -12,17 +12,25 @@ export const schema = z.object({
 });
 
 // 下载 zip 内的文件
-const api = defineCompose(validateQuery(schema), cacheLayer(), async (event) => {
-    const params: z.infer<typeof schema> = useJSON(event);
-    const url = decodeURIComponent(params.url);
-    const zip = new ZIPPath(url);
-    await zip.cacheFetch();
-    // 设置响应头部
-    setResponseHeader(event, "Content-Type", "application/octet-stream");
-    setResponseHeader(event, "Content-Disposition", `attachment; filename=${params.path.split("/").at(-1)}`);
-    const data = await zip.getFile(params.path);
-    if (!data) throw new NotFoundError();
-    setResponseHeader(event, "etag", "W/" + hash(url));
-    return new Blob([data]);
-});
+const api = defineCompose(
+    validateQuery(schema),
+    cacheLayer({
+        before(event) {
+            const params: z.infer<typeof schema> = useJSON(event);
+            const url = decodeURIComponent(params.url);
+            setResponseHeader(event, "Content-Type", "application/octet-stream");
+            setResponseHeader(event, "Content-Disposition", `attachment; filename=${params.path.split("/").at(-1)}`);
+            setResponseHeader(event, "etag", "W/" + hash(url));
+        },
+    }),
+    async (event) => {
+        const params: z.infer<typeof schema> = useJSON(event);
+        const url = decodeURIComponent(params.url);
+        const zip = new ZIPPath(url);
+        await zip.cacheFetch();
+        const data = await zip.getFile(params.path);
+        if (!data) throw new NotFoundError();
+        return new Blob([data]);
+    }
+);
 export default api;
