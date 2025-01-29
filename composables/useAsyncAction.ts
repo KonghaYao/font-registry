@@ -57,6 +57,13 @@ export function useAsyncJSON<Input, Output, Message = Output>(
     events.onError =
         events.onError ||
         ((err) => {
+            /** @ts-ignore */
+            if (err.response) {
+                /** @ts-ignore */
+                const response: Response = err.response;
+                /** @ts-ignore */
+                return ElMessage.error(response._data.statusMessage);
+            }
             ElMessage.error("请求失败: " + err.message);
         });
     return useAsyncAction<Input, Output, Message>(async (input) => {

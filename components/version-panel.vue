@@ -76,17 +76,17 @@ defineExpose({
                         {{ asset.assets_name }}
                     </span>
                     <div class="flex-1"></div>
-                    <span class="text-gray-500">
+                    <span class="text-gray-500 flex-none">
                         <!-- 文件 icon -->
                         <UIcon name="icon-park-outline:file-collection-one" class="w-5 h-5" />
                         {{ prettyBytes(asset.size) }}
                     </span>
-                    <a target="_blank" :href="asset.download_url" class="text-primary-500">
+                    <a target="_blank" :href="asset.download_url" class="text-primary-500 flex-none">
                         <UIcon name="icon-park-outline:download-one" class="w-5 h-5" />
                         <span> 下载文件 </span>
                     </a>
                     <div
-                        class="text-purple-800 cursor-pointer"
+                        class="text-purple-800 cursor-pointer flex-none"
                         @click="() => {
                             copy(createFontLink(pkgName, item.version!, asset.assets_name))
                             ElMessage.success('复制成功');
@@ -97,7 +97,7 @@ defineExpose({
                         <span> CSS 链接 </span>
                     </div>
                     <div
-                        class="text-purple-800/50 cursor-pointer"
+                        class="text-purple-800/50 cursor-pointer flex-none"
                         v-loading="prebuild.loading"
                         @click="
                             () => {
@@ -114,7 +114,7 @@ defineExpose({
                         <UIcon name="vscode-icons:file-type-css" class="w-5 h-5" />
                         <span> 构建 CSS </span>
                     </div>
-                    <span class="text-gray-400">
+                    <span class="text-gray-400 flex-none">
                         {{ new Date(item.created_at).toLocaleString() }}
                     </span>
                 </li>

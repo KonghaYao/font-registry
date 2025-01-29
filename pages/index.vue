@@ -41,9 +41,18 @@ onMounted(() => {
                 <p class="my-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                     字索致力于为用户提供高质量、易用的在线字体版本发布与展示服务。
                 </p>
-                <NuxtLink to="/packages">
-                    <el-button type="primary">进入字体库</el-button>
-                </NuxtLink>
+                <div class="flex gap-4 justify-center">
+                    <NuxtLink to="/packages">
+                        <el-button type="primary">进入字体库</el-button>
+                    </NuxtLink>
+                    <el-button v-if="user" @click="useMagicDialog().toggle('import-from-github-dialog')">
+                        从 github 导入
+                    </el-button>
+                    <import-from-github-dialog />
+                    <NuxtLink to="/login" v-if="!user">
+                        <el-button>登录</el-button>
+                    </NuxtLink>
+                </div>
             </div>
         </div>
     </div>

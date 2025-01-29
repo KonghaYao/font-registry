@@ -35,7 +35,7 @@ export class CustomError extends Error {
     toH3Error() {
         return createError({
             status: this.httpCode,
-            statusMessage: this.name,
+            statusMessage: this.message,
             message: this.message,
         });
     }
@@ -48,7 +48,7 @@ export class AuthorizationError extends CustomError {
 }
 
 export class ValidationError extends CustomError {
-    constructor(description = "Invalid query or body") {
+    constructor(description = "Invalid Query or body") {
         super("ValidationError", 412, description, true);
     }
 }
@@ -70,6 +70,10 @@ export class DatabaseError extends CustomError {
     }
 }
 
+/**
+ * 自动处理 supabase 产出的错误
+ *  @example useSupabaseQuery(await client.from("fonts").select("*").eq("id", id))
+ */
 export const useSupabaseQuery = <T>(
     res: PostgrestSingleResponse<T>,
     validation?: (res: PostgrestResponseSuccess<T>) => void | never

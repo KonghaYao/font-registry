@@ -6,8 +6,8 @@ import { Database } from "~/types/database.types";
 
 /** 权限验证中间件 **/
 export const authLayer: ComposeEventHandler = async (event) => {
-    const user = await serverSupabaseUser(event);
-    if (!user) throw new AuthorizationError();
+    const user = await serverSupabaseUser(event).catch((e) => {});
+    if (!user) throw new AuthorizationError("请先登录");
     event.context.user = user;
 };
 
@@ -15,7 +15,7 @@ export const authLayer: ComposeEventHandler = async (event) => {
 export const useUser = (event: H3Event<Request>): Awaited<ReturnType<typeof serverSupabaseUser>> => {
     return event.context.user;
 };
-
+/** 获取用户角色 */
 const useRole = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
         const client = await serverSupabaseClient(event);
@@ -31,7 +31,7 @@ const useRole = defineCachedFunction(
         },
     }
 );
-
+/** 获取权限编码 */
 const usePermissions = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
         const roles = await useRole(event, user_id);
@@ -48,7 +48,7 @@ const usePermissions = defineCachedFunction(
         },
     }
 );
-
+/** 判断用户是否具有所有权限层 */
 export const hasPermissionLayer =
     (permissions: Database["public"]["Enums"]["app_permission"][]): ComposeEventHandler =>
     async (e) => {
@@ -57,10 +57,11 @@ export const hasPermissionLayer =
         if (permissions.every((i) => data.includes(i))) {
             return;
         } else {
-            throw new AuthorizationError();
+            throw new AuthorizationError("您没有权限访问该资源");
         }
     };
 
+/** 判断用户是否具有所有角色 */
 export const hasRoleLayer =
     (roles: Database["public"]["Enums"]["app_role"][]): ComposeEventHandler =>
     async (e) => {
@@ -69,6 +70,6 @@ export const hasRoleLayer =
         if (roles.every((i) => data.includes(i))) {
             return;
         } else {
-            throw new AuthorizationError();
+            throw new AuthorizationError("您没有角色权限");
         }
     };

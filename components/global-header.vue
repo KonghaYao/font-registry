@@ -50,7 +50,7 @@ const userDropdowns = computed(() => [
 
 <template>
     <header class="sticky top-0 left-0 z-50">
-        <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-3 dark:bg-gray-800 border-b">
+        <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-3 dark:bg-gray-800 border-b h-24">
             <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                 <NuxtLink to="/" class="flex items-center">
                     <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"> 字索 </span>
