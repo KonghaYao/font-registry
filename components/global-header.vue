@@ -53,7 +53,7 @@ const userDropdowns = computed(() => [
         <nav class="bg-gray-50 border-gray-200 px-4 lg:px-6 py-3 dark:bg-gray-800 border-b">
             <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
                 <NuxtLink to="/" class="flex items-center">
-                    <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"> 字缒 </span>
+                    <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"> 字索 </span>
                 </NuxtLink>
                 <div class="flex items-center lg:order-2">
                     <UDropdown v-if="user?.email" :items="userDropdowns" :popper="{ placement: 'bottom-start' }">

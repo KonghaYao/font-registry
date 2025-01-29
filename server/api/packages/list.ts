@@ -2,6 +2,7 @@ import z from "zod";
 import { defineCachedCompose } from "../../utils/compose";
 import { validateQuery, useJSON } from "../../utils/validation";
 import { serverSupabaseServiceRole } from "#supabase/server";
+import { H3Event } from "h3";
 export const schema = z.object({
     /* 查询参数 */
     query: z.optional(z.string()),
@@ -19,5 +20,9 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
     return chain.order("created_at", { ascending: false }).limit(10);
 })({
     maxAge: 10 * 60,
+    getKey: (event: H3Event) => {
+        const url = new URL(event.node.req.url!, "http://localhost");
+        return `packages:list:${url.search}`;
+    },
 });
 export default api;

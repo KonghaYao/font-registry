@@ -65,8 +65,8 @@ function genServerEndPointType(sourceFile, checker) {
     const dtsContent = `
 declare module "${name}" {
     type API = ${defaultExportType};
-    export type Input = API extends WrappedEventHandler<infer I, infer O> ? NonNullable<I> : never;
-    export type Output = API extends WrappedEventHandler<infer I, infer O> ? NonNullable<Awaited<O>> : never;
+    export type Input = API extends WrappedEventHandler<infer I, infer O> ? NonNullable<I> : undefined;
+    export type Output = API extends WrappedEventHandler<infer I, infer O> ? NonNullable<Awaited<O>> : undefined;
 
 }
 `;

@@ -16,7 +16,7 @@ export const useUser = (event: H3Event<Request>): Awaited<ReturnType<typeof serv
     return event.context.user;
 };
 
-export const useRole = defineCachedFunction(
+const useRole = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
         const client = await serverSupabaseClient(event);
         const { data } = useSupabaseQuery(await client.from("user_roles").select("*").eq("user_id", user_id));
@@ -32,7 +32,7 @@ export const useRole = defineCachedFunction(
     }
 );
 
-export const usePermissions = defineCachedFunction(
+const usePermissions = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
         const roles = await useRole(event, user_id);
         const client = await serverSupabaseClient(event);

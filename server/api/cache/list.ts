@@ -1,4 +1,4 @@
-import { hasPermissionLayer, hasRoleLayer } from "~/server/utils/auth";
+import { hasRoleLayer } from "~/server/utils/auth";
 
 export default defineCompose(authLayer, hasRoleLayer(["admin"]), async (event) => {
     const store = useStorage("cache");

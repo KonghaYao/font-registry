@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type List from "#server-endpoint/api/cache/list.ts";
 import type Clear from "#server-endpoint/api/cache/clear.ts";
+
 const cacheList = useAsyncJSON<List.Input, List.Output>(async () => {
     return {
         url: "/api/cache/list",
@@ -14,10 +15,10 @@ const deleteAction = useAsyncJSON<Clear.Input, Clear.Output>(async () => {
 });
 const deleteCache = async (cacheKey?: string | string[]) => {
     await deleteAction.fetch(Array.isArray(cacheKey) ? { names: cacheKey } : { name: cacheKey });
-    await cacheList.fetch(null);
+    await cacheList.fetch();
 };
 onMounted(() => {
-    cacheList.fetch(null);
+    cacheList.fetch();
 });
 const filterText = ref("");
 const filteredList = computed(() => {
@@ -31,7 +32,7 @@ const filteredList = computed(() => {
             <div class="font-bold flex-none">系统缓存管理</div>
             <template #actions>
                 <el-input size="small" placeholder="搜索 key 值" class="pr-4" v-model="filterText"></el-input>
-                <el-button size="small" :loading="cacheList.loading" @click="cacheList.fetch(null)">刷新</el-button>
+                <el-button size="small" :loading="cacheList.loading" @click="cacheList.fetch()">刷新</el-button>
                 <el-button
                     size="small"
                     type="danger"

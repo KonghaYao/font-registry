@@ -9,6 +9,7 @@ import { authLayer, useUser } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
 import { sseResponse, useSSE } from "../utils/useSSE";
 import { useSupabaseQuery } from "../utils/Errors";
+import { clearCacheLayer } from "../utils/cache";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
@@ -20,6 +21,9 @@ export const schema = z.object({
 export default defineCompose(
     authLayer,
     validateJSON(schema),
+    clearCacheLayer((event, result) => {
+        return ["nitro:handlers:_:packageslist.json"];
+    }),
     sseResponse(async (event) => {
         const sse = useSSE(event);
         const user = useUser(event)!;

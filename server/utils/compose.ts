@@ -23,7 +23,7 @@ export type EndPoint<T, D> = (
 
 /** 简单实现 compose，并不需要 next 函数来支持 */
 export const defineCompose = <T, D>(
-    ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
+    ...args: [...ComposeEventHandler<T, unknown | D>[], ComposeEventHandler<T, D>]
 ): WrappedEventHandler<T, D> => {
     return defineEventHandler(async (event) => {
         event.context._afterResponse = [];
@@ -53,7 +53,7 @@ export const useAfterResponse = <T>(event: H3Event, callback: AfterResponseCallb
 };
 
 export const defineCachedCompose = <T, D>(
-    ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
+    ...args: [...ComposeEventHandler<T, unknown | D>[], ComposeEventHandler<T, D>]
 ): ((opts: any) => WrappedEventHandler<T, D>) => {
     return (opts: Parameters<typeof defineCachedEventHandler>[1]): WrappedEventHandler<T, D> =>
         /** @ts-ignore */

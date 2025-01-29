@@ -5,7 +5,7 @@
     "scripts": {
         "gen:db": "supabase gen types typescript --project-id zyttkucvkhhyxvirfcvh > types/database.types.ts",
         "gen:server": "cd ./server && node ./gen-type.mjs",
-        "build": "sh fix_deps.sh &&nuxt build",
+        "build": "pnpm gen:server && sh fix_deps.sh &&nuxt build",
         "dev": "nuxt dev",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
