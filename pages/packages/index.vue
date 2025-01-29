@@ -11,6 +11,10 @@ const PackagesData = useAsyncJSON<List.Input, List.Output>(() => {
 onMounted(() => {
     PackagesData.fetch({});
 });
+const getPreviewLink = (pkgName: string, style: any) => {
+    let base = new URL(createFontLink(pkgName, style.version, style.file_name), location.href);
+    return new URL("./preview.svg", base).toString();
+};
 </script>
 
 <template>
@@ -27,8 +31,17 @@ onMounted(() => {
                     </NuxtLink>
                 </div>
             </header>
-            <div class="text-gray-600 mb-3">
-                {{ pack.description }}
+            <div class="text-gray-600 mb-3 flex flex-nowrap">
+                <div class="flex-1 line-clamp-3">
+                    {{ pack.description }}
+                </div>
+                <div class="flex-1 block place-content-center" v-if="pack.style">
+                    <img
+                        :src="getPreviewLink(pack.name, pack.style)"
+                        :alt="'image preview for font ' + pack.name"
+                        loading="lazy"
+                    />
+                </div>
             </div>
             <footer class="flex-col -m-2 justify-between text-sm">
                 <div class="p-2 w-full md:w-1/2 lg:w-1/3">
