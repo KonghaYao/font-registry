@@ -20,6 +20,5 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
     return chain.limit(20);
 })({
     maxAge: 10 * 60,
-    getKey: (e) => e,
 });
 export default api;

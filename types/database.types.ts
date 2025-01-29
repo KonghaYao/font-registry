@@ -91,6 +91,7 @@ export type Database = {
           from: string | null
           homepage: string | null
           id: number
+          is_published: boolean
           keywords: string[]
           latest: string
           license: string | null
@@ -107,6 +108,7 @@ export type Database = {
           from?: string | null
           homepage?: string | null
           id?: number
+          is_published?: boolean
           keywords: string[]
           latest: string
           license?: string | null
@@ -123,6 +125,7 @@ export type Database = {
           from?: string | null
           homepage?: string | null
           id?: number
+          is_published?: boolean
           keywords?: string[]
           latest?: string
           license?: string | null
@@ -141,6 +144,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      role_permissions: {
+        Row: {
+          id: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          id?: number
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          id?: number
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: number
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: number
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: number
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       versions: {
         Row: {
@@ -188,7 +227,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_permission: "all"
+      app_role: "admin" | "manager"
     }
     CompositeTypes: {
       [_ in never]: never
