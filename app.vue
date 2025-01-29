@@ -6,12 +6,13 @@
 <style>
 body {
     --el-color-primary: #2ca6b8;
-    --el-color-primary-light-3: rgb(121.3, 187.1, 255);
+    --el-color-primary-light-3: #33bacf;
     --el-color-primary-light-5: rgb(159.5, 206.5, 255);
     --el-color-primary-light-7: rgb(197.7, 225.9, 255);
     --el-color-primary-light-8: rgb(216.8, 235.6, 255);
     --el-color-primary-light-9: rgb(235.9, 245.3, 255);
     --el-color-primary-dark-2: rgb(51.2, 126.4, 204);
+
     --el-color-success: #67c23a;
     --el-color-success-light-3: rgb(148.6, 212.3, 117.1);
     --el-color-success-light-5: rgb(179, 224.5, 156.5);
