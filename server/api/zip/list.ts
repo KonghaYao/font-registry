@@ -1,5 +1,4 @@
 import z from "zod";
-import { defineCompose } from "../../utils/compose";
 import { useJSON, validateQuery } from "../../utils/validation";
 import { ZIPPath } from "../../utils/zip";
 export const schema = z.object({

@@ -7,6 +7,13 @@ export default defineNuxtConfig({
     supabase: {
         redirect: false,
     },
+    runtimeConfig: {
+        NUXT_SPLIT_SERVER: process.env.NUXT_SPLIT_SERVER,
+        NUXT_SPLIT_SERVER_TOKEN: process.env.NUXT_SPLIT_SERVER_TOKEN,
+        NUXT_WEBSITE_URL: process.env.NUXT_WEBSITE_URL,
+        NUXT_OSS_ROOT: process.env.NUXT_OSS_ROOT,
+        VITE_CDN_ROOT: process.env.VITE_CDN_ROOT,
+    },
     components: [
         {
             global: true,

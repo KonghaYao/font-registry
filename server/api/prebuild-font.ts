@@ -77,14 +77,14 @@ export default defineCompose(
                 asset.assets_name +
                 "/"
             ).replaceAll(".", "_");
-            const file_url = new URL(asset.download_url, process.env.NUXT_WEBSITE_URL).toString();
+            const file_url = new URL(asset.download_url, useRuntimeConfig().NUXT_WEBSITE_URL).toString();
             console.log(file_url);
-            await fetch(process.env.NUXT_SPLIT_SERVER + "/upload", {
+            await fetch(useRuntimeConfig().NUXT_SPLIT_SERVER + "/upload", {
                 method: "POST",
                 headers: {
                     authorization:
                         "Bearer " +
-                        (await sha256(process.env.NUXT_SPLIT_SERVER_TOKEN! + Math.floor(Date.now() / 10000))),
+                        (await sha256(useRuntimeConfig().NUXT_SPLIT_SERVER_TOKEN! + Math.floor(Date.now() / 10000))),
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -99,7 +99,7 @@ export default defineCompose(
 
             console.log("构建完成", file_folder);
 
-            const bin = await fetch(process.env.NUXT_OSS_ROOT + file_folder + "reporter.bin").then((res) =>
+            const bin = await fetch(useRuntimeConfig().NUXT_OSS_ROOT + file_folder + "reporter.bin").then((res) =>
                 res.arrayBuffer()
             );
             const reporter = decodeReporter(new Uint8Array(bin));
