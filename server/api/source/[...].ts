@@ -1,9 +1,13 @@
 import { cacheLayer } from "~/server/utils/cache";
+import { getContentType } from "~/server/utils/contentType";
 import { NotFoundError } from "~/server/utils/Errors";
 
 export default defineCompose(
     (event) => {
         useAfterResponse(event, () => {
+            getContentType(event.path, (type) => {
+                setResponseHeader(event, "content-type", type);
+            });
             setResponseHeader(event, "Cache-Control", "max-age=86400");
             setResponseHeader(event, "access-control-allow-origin", "*");
         });

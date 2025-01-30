@@ -49,7 +49,7 @@ export const defineCompose = <T, D>(
 
 export type AfterResponseCallback<T> = (result: T) => Promise<void> | void;
 export const useAfterResponse = <T>(event: H3Event, callback: AfterResponseCallback<T>) => {
-    event.context._afterResponse.push(callback);
+    event.context._afterResponse.unshift(callback);
 };
 
 export const defineCachedCompose = <T, D>(
