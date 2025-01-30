@@ -38,9 +38,9 @@ export const defineCompose = <T, D>(
                 }
             } catch (e) {
                 if (e instanceof CustomError) {
-                    console.error(e);
                     throw e.toH3Error();
                 }
+                console.error(e);
                 throw e;
             }
         }

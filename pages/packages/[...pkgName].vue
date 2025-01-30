@@ -10,10 +10,11 @@ const route = useRoute();
 const pkgName = route.params.pkgName as string[];
 
 const pkgKey = pkgName.join("/");
+console.log(pkgKey);
 const urlConfig = reactive({ a: "", img: "" });
 provide("mdc-base-url", urlConfig);
-const pkgDetail = await useFetch<PackageType.Output>("/api/packages/get?pkgKey=" + pkgKey);
-if (pkgDetail.data.value?.from === "github_api") {
+const { data: pkgDetail } = await useFetch<PackageType.Output>("/api/packages/get?pkgKey=" + pkgKey);
+if (pkgDetail.value?.from === "github_api") {
     Object.assign(urlConfig, {
         a: "https://github.com/" + pkgKey + "/",
         img: "https://ik.imagekit.io/github/" + pkgKey + "/raw/HEAD/",
@@ -28,7 +29,7 @@ const items = [
     },
 ];
 const fontInfoOfStyle = computed(() => {
-    return (pkgDetail.data.value?.style || {}) as {
+    return (pkgDetail.value?.style || {}) as {
         family: string;
         weight: string;
         file_name: string;
@@ -37,11 +38,7 @@ const fontInfoOfStyle = computed(() => {
 useHead({
     link: [
         {
-            href: createFontLink(
-                pkgDetail.data.value?.name!,
-                pkgDetail.data.value?.latest!,
-                fontInfoOfStyle.value.file_name
-            ),
+            href: createFontLink(pkgDetail.value?.name!, pkgDetail.value?.latest!, fontInfoOfStyle.value.file_name),
             rel: "stylesheet",
         },
     ],
@@ -57,27 +54,22 @@ useHead({
     >
         <div class="my-6 p-8 bg-blue-50">
             <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
-                {{ pkgDetail.data.value?.name_cn }}
-                {{ pkgDetail.data.value?.name }}
+                <package-name :name="pkgDetail?.name" :name_cn="pkgDetail?.name_cn"></package-name>
             </div>
-            <div>
-                {{ pkgDetail.data.value?.description }}
+            <div class="mb-6">
+                {{ pkgDetail?.description }}
             </div>
-            <PackageDetailRow :pack="pkgDetail.data.value!"></PackageDetailRow>
+            <PackageDetailRow :pack="pkgDetail!"></PackageDetailRow>
         </div>
         <UTabs :items="items" :default-index="0">
             <template #item="{ item }">
                 <MDC
                     v-if="item.label === 'Readme'"
                     class="markdown-body mt-4"
-                    :value="pkgDetail.data.value?.readme || ''"
+                    :value="pkgDetail?.readme || ''"
                     tag="article"
                 />
-                <version-panel
-                    v-if="item.label === '版本'"
-                    :pkg-id="pkgDetail.data.value?.id!"
-                    :pkg-name="pkgDetail.data.value?.name!"
-                >
+                <version-panel v-if="item.label === '版本'" :pkg-id="pkgDetail?.id!" :pkg-name="pkgDetail?.name!">
                 </version-panel>
             </template>
         </UTabs>

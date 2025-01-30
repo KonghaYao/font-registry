@@ -23,9 +23,6 @@ const getPreviewLink = (pkgName: string, style: any) => {
             <header class="flex justify-between items-baseline">
                 <package-name :name_cn="pack.name_cn" :name="pack.name"></package-name>
                 <div class="flex-1 flex justify-end gap-4">
-                    <NuxtLink v-if="pack.from === 'github_api'" :to="'https://github.com/' + pack.name">
-                        <u-icon name="ant-design:github-filled" class="w-5 h-5 text-black"></u-icon>
-                    </NuxtLink>
                     <NuxtLink v-if="pack.homepage" :to="pack.homepage">
                         <UIcon name="icon-park-outline:link" class="w-5 h-5 text-primary-500" />
                     </NuxtLink>
