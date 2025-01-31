@@ -16,7 +16,7 @@ export const useUser = (event: H3Event<Request>): Awaited<ReturnType<typeof serv
     return event.context.user;
 };
 /** 获取用户角色 */
-const useRole = defineCachedFunction(
+const getRole = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
         const client = await serverSupabaseClient(event);
         const { data } = useSupabaseQuery(await client.from("user_roles").select("*").eq("user_id", user_id));
@@ -32,9 +32,9 @@ const useRole = defineCachedFunction(
     }
 );
 /** 获取权限编码 */
-const usePermissions = defineCachedFunction(
+const getPermissions = defineCachedFunction(
     async (event: H3Event<Request>, user_id: string) => {
-        const roles = await useRole(event, user_id);
+        const roles = await getRole(event, user_id);
         const client = await serverSupabaseClient(event);
         const { data: permissions } = useSupabaseQuery(
             await client.from("role_permissions").select("*").in("role", roles)
@@ -48,12 +48,13 @@ const usePermissions = defineCachedFunction(
         },
     }
 );
+
 /** 判断用户是否具有所有权限层 */
 export const hasPermissionLayer =
     (permissions: Database["public"]["Enums"]["app_permission"][]): ComposeEventHandler =>
     async (e) => {
         const user = useUser(e)!;
-        const data = await usePermissions(e, user.id);
+        const data = await getPermissions(e, user.id);
         if (permissions.every((i) => data.includes(i))) {
             return;
         } else {
@@ -66,7 +67,7 @@ export const hasRoleLayer =
     (roles: Database["public"]["Enums"]["app_role"][]): ComposeEventHandler =>
     async (e) => {
         const user = useUser(e)!;
-        const data = await useRole(e, user.id);
+        const data = await getRole(e, user.id);
         if (roles.every((i) => data.includes(i))) {
             return;
         } else {

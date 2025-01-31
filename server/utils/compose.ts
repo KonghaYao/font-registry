@@ -17,6 +17,10 @@ export interface ComposeEventHandler<
     (event: H3Event<Request>): Response;
 }
 
+export interface ConditionEventHandler<D = boolean> {
+    (event: H3Event<Request>): D | Promise<D>;
+}
+
 export type EndPoint<T, D> = (
     ...args: [...ComposeEventHandler<T, unknown>[], ComposeEventHandler<T, D>]
 ) => WrappedEventHandler<T, D>;

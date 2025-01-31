@@ -3,9 +3,12 @@ import type List from "#server-endpoint/api/packages/list.ts";
 definePageMeta({
     layout: "packages",
 });
+
+const isSuper = useSuperMode();
+
 const PackagesData = useAsyncJSON<List.Input, List.Output>(() => {
     return {
-        url: "/api/packages/list",
+        url: isSuper.value ? "/api/packages/list-all" : "/api/packages/list",
     };
 });
 onMounted(() => {
@@ -23,6 +26,9 @@ const getPreviewLink = (pkgName: string, style: any) => {
             <header class="flex justify-between items-baseline">
                 <package-name :name_cn="pack.name_cn" :name="pack.name"></package-name>
                 <div class="flex-1 flex justify-end gap-4">
+                    <el-tag v-if="isSuper" :type="pack.is_published ? 'success' : 'danger'">
+                        {{ pack.is_published ? "已发布" : "未发布" }}
+                    </el-tag>
                     <NuxtLink v-if="pack.homepage" :to="pack.homepage">
                         <UIcon name="icon-park-outline:link" class="w-5 h-5 text-primary-500" />
                     </NuxtLink>

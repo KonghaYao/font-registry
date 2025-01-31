@@ -28,7 +28,9 @@
                         <span class="font-bold">{{ item.name_cn }}</span>
                         <span>{{ item.name }}</span>
                     </a>
-                    <el-tag>{{ item.is_published ? "已发布" : "未发布" }}</el-tag>
+                    <el-tag :type="item.is_published ? 'success' : 'danger'">{{
+                        item.is_published ? "已发布" : "未发布"
+                    }}</el-tag>
                     <el-button
                         size="small"
                         @click="
@@ -62,13 +64,13 @@ const config = computed(() => [
         value: user.value?.created_at && new Date(user.value?.created_at).toLocaleString(),
     },
 ]);
-
+const isSuper = useSuperMode();
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    const { data, error } = await client
-        .from("packages")
-        .select("name_cn,name,id,is_published")
-        .eq("user_id", user.value?.id!);
+    let builder = client.from("packages").select("name_cn,name,id,is_published");
+
+    if (!isSuper.value) builder = builder.eq("user_id", user.value?.id!);
+    const { data, error } = await builder;
     if (error) throw error;
     return data;
 });
