@@ -54,7 +54,7 @@ useHead({
     >
         <div class="my-6 p-8 bg-blue-50">
             <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
-                <package-name :name="pkgDetail?.name" :name_cn="pkgDetail?.name_cn"></package-name>
+                <package-name :name="pkgDetail?.name!" :name_cn="pkgDetail?.name_cn!"></package-name>
             </div>
             <div class="mb-6">
                 {{ pkgDetail?.description }}

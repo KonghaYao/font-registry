@@ -13,7 +13,10 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
     const client = serverSupabaseServiceRole(event);
     let chain = client
         .from("packages")
-        .select("name,latest,keywords,name_cn,created_at,from,style,homepage,description,license,author!inner(*)");
+        .select(
+            "name,latest,is_published,keywords,name_cn,created_at,from,style,homepage,description,license,author!inner(*)"
+        )
+        .eq("is_published", true);
 
     if (data.query)
         chain = chain.or(["name", "name_cn", "description"].map((i) => `${i}.ilike.%${data.query}%`).join(","));

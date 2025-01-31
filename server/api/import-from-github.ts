@@ -37,7 +37,6 @@ export default defineCompose(
             repo: params.repo,
         });
         sse.log("找到 github 仓库 " + repo.data.full_name);
-
         const author = useSupabaseQuery(
             await client
                 .from("authors")
@@ -167,6 +166,14 @@ export default defineCompose(
                 .select()
         );
         sse.log(`导入 github assets ${assetsInsert.data?.length} 个`);
+        useSupabaseQuery(
+            await client
+                .from("packages")
+                .update({
+                    is_published: true,
+                })
+                .eq("id", pId)
+        );
         return {
             package: pack.data[0],
             version: versionResult.data,

@@ -53,6 +53,7 @@ const upload = (data: any) => {
     });
 };
 const magic = useMagicDialog();
+defineExpose({ model });
 </script>
 <template>
     <magic-dialog id="import-from-github-dialog" :title="'导入 Github 仓库字体'" min-width="500px">

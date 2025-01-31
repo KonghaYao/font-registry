@@ -21,7 +21,6 @@
                         从 github 导入
                     </el-button>
                 </div>
-                <import-from-github-dialog />
             </template>
             <el-row>
                 <el-col :span="24" v-for="item in packages.data" :key="item.id" class="mb-4">
@@ -29,13 +28,28 @@
                         <span class="font-bold">{{ item.name_cn }}</span>
                         <span>{{ item.name }}</span>
                     </a>
+                    <el-tag>{{ item.is_published ? "已发布" : "未发布" }}</el-tag>
+                    <el-button
+                        size="small"
+                        @click="
+                            injectAndOpenImport({
+                                name: item.name.split('/')[0],
+                                repo: item.name.split('/')[1],
+                                name_cn: item.name_cn,
+                            })
+                        "
+                    >
+                        重新导入
+                    </el-button>
                 </el-col>
             </el-row>
         </el-card>
+        <import-from-github-dialog ref="importDialog" />
     </div>
 </template>
 
 <script setup lang="ts">
+const importDialog = ref();
 const user = useSupabaseUser();
 
 const config = computed(() => [
@@ -51,12 +65,20 @@ const config = computed(() => [
 
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    const { data, error } = await client.from("packages").select("name_cn,name,id").eq("user_id", user.value?.id!);
+    const { data, error } = await client
+        .from("packages")
+        .select("name_cn,name,id,is_published")
+        .eq("user_id", user.value?.id!);
     if (error) throw error;
     return data;
 });
+
 onMounted(() => {
     console.log(user);
     packages.fetch(null);
 });
+const injectAndOpenImport = (data: any) => {
+    importDialog.value.model = data;
+    useMagicDialog().toggle("import-from-github-dialog");
+};
 </script>
