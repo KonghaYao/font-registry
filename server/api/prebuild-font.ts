@@ -118,7 +118,7 @@ export default defineCompose(
             useSupabaseQuery(
                 await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select()
             );
-            return { ...style, pkgId: pkg.data.id.toString() };
+            return { ...style, pkgId: pkg.data.id.toString(), name: body.name };
         }
         return { ...style, pkgId: pkg.data.id.toString(), name: body.name };
     }

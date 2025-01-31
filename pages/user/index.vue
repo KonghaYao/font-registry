@@ -49,6 +49,7 @@
                         @click="
                             rebuildImport({
                                 name: item.name,
+                                force: true,
                             })
                         "
                     >
@@ -93,10 +94,17 @@ const injectAndOpenImport = (data: any) => {
     importDialog.value.model = data;
     useMagicDialog().toggle("import-from-github-dialog");
 };
-const prebuild = useAsyncJSON<{ name: string }, never>(() => ({
-    url: "/api/prebuild-font",
-    method: "post",
-}));
+const prebuild = useAsyncJSON<{ name: string }, never>(
+    () => ({
+        url: "/api/prebuild-font",
+        method: "post",
+    }),
+    {
+        onSuccess(data, input) {
+            ElMessage.success(`${input.name} 重新构建成功`);
+        },
+    }
+);
 const rebuildImport = (data: any) => {
     prebuild.fetch(data);
 };
