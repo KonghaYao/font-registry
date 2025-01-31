@@ -6,10 +6,10 @@ use axum::{
     Router,
 };
 use reqwest::get;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{fs, io::Read};
+use tower_http::compression::CompressionLayer;
 use zip::read::ZipArchive;
-
 #[derive(Deserialize)]
 struct Params {
     url: String,
@@ -56,6 +56,11 @@ async fn get_zip_content(Json(payload): Json<Params>) -> impl IntoResponse {
 struct ListParams {
     url: String,
 }
+#[derive(Serialize)]
+struct ListResult {
+    size: u64,
+    name: String,
+}
 
 async fn list_zip_paths(Json(payload): Json<ListParams>) -> impl IntoResponse {
     // 解码 URL
@@ -67,13 +72,20 @@ async fn list_zip_paths(Json(payload): Json<ListParams>) -> impl IntoResponse {
     // 解析 ZIP 文件并提取所有文件路径
     let mut archive =
         ZipArchive::new(std::io::Cursor::new(zip_data)).expect("Failed to parse zip file");
-    let paths: Vec<String> = (0..archive.len())
+    let paths: Vec<ListResult> = (0..archive.len())
         .filter_map(|i| {
-            archive
-                .by_index(i)
-                .ok()?
+            let file = archive.by_index(i).ok()?;
+            if file.is_dir() {
+                return None;
+            }
+            let file_name = file
                 .enclosed_name()
-                .map(|p| p.to_string_lossy().into_owned())
+                .map(|p| p.to_string_lossy().into_owned());
+            let file_size = file.size();
+            Some(ListResult {
+                size: file_size,
+                name: file_name.unwrap(),
+            })
         })
         .collect();
 
@@ -110,6 +122,7 @@ async fn get_cached_zip_file(decoded_url: &str) -> Vec<u8> {
 #[tokio::main]
 async fn main() {
     let app = Router::new()
+        .layer(CompressionLayer::new())
         .route("/list", post(list_zip_paths))
         .route("/get", post(get_zip_content));
 
@@ -146,10 +159,7 @@ mod tests {
         // 将响应内容写入文件
         let data = res.text().await.unwrap();
 
-        assert_eq!(
-            &data,
-            r#"["lxgw-wenkai-v1.510/","lxgw-wenkai-v1.510/OFL.txt","lxgw-wenkai-v1.510/LXGWWenKai-Medium.ttf","lxgw-wenkai-v1.510/LXGWWenKai-Regular.ttf","lxgw-wenkai-v1.510/LXGWWenKaiMono-Regular.ttf","lxgw-wenkai-v1.510/LXGWWenKaiMono-Light.ttf","lxgw-wenkai-v1.510/LXGWWenKaiMono-Medium.ttf","lxgw-wenkai-v1.510/LXGWWenKai-Light.ttf"]"#
-        )
+        assert_eq!(data.len(), 471)
     }
     #[tokio::test]
     async fn test_get_endpoint() {
@@ -174,6 +184,6 @@ mod tests {
         // 将响应内容写入文件
         let data = res.text().await.unwrap();
 
-        println!("{}", data);
+        assert_eq!(data.len(), 4448)
     }
 }
