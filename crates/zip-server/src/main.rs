@@ -1,11 +1,11 @@
 use axum::{
     body::Body,
-    extract::Json,
+    extract::Query,
     response::{IntoResponse, Response},
-    routing::post,
+    routing::get,
     Router,
 };
-use reqwest::get;
+use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::{fs, io::Read};
 use tower_http::compression::CompressionLayer;
@@ -15,11 +15,17 @@ struct Params {
     url: String,
     path: String,
 }
-async fn get_zip_content(Json(payload): Json<Params>) -> impl IntoResponse {
+async fn get_zip_content(Query(payload): Query<Params>) -> impl IntoResponse {
     // 解码 URL 和路径
-    let decoded_url = &payload.url;
+    let decoded_url = percent_decode_str(&payload.url)
+        .decode_utf8()
+        .unwrap()
+        .to_string();
 
-    let decoded_path = &payload.path;
+    let decoded_path = percent_decode_str(&payload.path)
+        .decode_utf8()
+        .unwrap()
+        .to_string();
 
     // 下载ZIP文件
     let zip_data = get_cached_zip_file(&decoded_url).await;
@@ -52,7 +58,7 @@ async fn get_zip_content(Json(payload): Json<Params>) -> impl IntoResponse {
         .unwrap()
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct ListParams {
     url: String,
 }
@@ -62,9 +68,12 @@ struct ListResult {
     name: String,
 }
 
-async fn list_zip_paths(Json(payload): Json<ListParams>) -> impl IntoResponse {
+async fn list_zip_paths(Query(payload): Query<ListParams>) -> impl IntoResponse {
     // 解码 URL
-    let decoded_url = &payload.url;
+    let decoded_url = percent_decode_str(&payload.url)
+        .decode_utf8()
+        .unwrap()
+        .to_string();
 
     // 下载 ZIP 文件
     let zip_data = get_cached_zip_file(&decoded_url).await;
@@ -107,7 +116,7 @@ async fn get_cached_zip_file(decoded_url: &str) -> Vec<u8> {
         }
     }
     // 下载 ZIP 文件
-    let resp = get(decoded_url)
+    let resp = reqwest::get(decoded_url)
         .await
         .expect("Failed to fetch the zip file");
     let binary = resp
@@ -123,8 +132,8 @@ async fn get_cached_zip_file(decoded_url: &str) -> Vec<u8> {
 async fn main() {
     let app = Router::new()
         .layer(CompressionLayer::new())
-        .route("/list", post(list_zip_paths))
-        .route("/get", post(get_zip_content));
+        .route("/list", get(list_zip_paths))
+        .route("/get", get(get_zip_content));
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
@@ -142,16 +151,9 @@ mod tests {
         // 创建 HTTP 客户端
         let client = Client::new();
 
-        // 准备请求体
-        let payload = json!({
-            "url": "https://github.com/lxgw/LxgwWenKai/releases/download/v1.510/lxgw-wenkai-v1.510.zip",
-        });
-
         // 发送 POST 请求
         let res = client
-            .post("http://localhost:3000/list")
-            .header("Content-Type", "application/json")
-            .body(Body::from(serde_json::to_string(&payload).unwrap()))
+            .get("http://localhost:3000/list?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip")
             .send()
             .await
             .expect("Failed to execute request.");
@@ -166,17 +168,9 @@ mod tests {
         // 创建 HTTP 客户端
         let client = Client::new();
 
-        // 准备请求体
-        let payload = json!({
-            "url": "https://github.com/lxgw/LxgwWenKai/releases/download/v1.510/lxgw-wenkai-v1.510.zip",
-            "path":"lxgw-wenkai-v1.510/OFL.txt"
-        });
-
         // 发送 POST 请求
         let res = client
-            .post("http://localhost:3000/get")
-            .header("Content-Type", "application/json")
-            .body(Body::from(serde_json::to_string(&payload).unwrap()))
+            .get("http://localhost:3000/get?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip&path=lxgw-wenkai-v1.510%2FOFL.txt")
             .send()
             .await
             .expect("Failed to execute request.");
