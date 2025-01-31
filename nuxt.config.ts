@@ -13,6 +13,7 @@ export default defineNuxtConfig({
         NUXT_WEBSITE_URL: process.env.NUXT_WEBSITE_URL,
         NUXT_OSS_ROOT: process.env.NUXT_OSS_ROOT,
         VITE_CDN_ROOT: process.env.VITE_CDN_ROOT,
+        NUXT_ZIP_SERVER: process.env.NUXT_ZIP_SERVER,
     },
     components: [
         {

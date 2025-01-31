@@ -43,6 +43,17 @@
                     >
                         重新导入
                     </el-button>
+                    <el-button
+                        :loading="prebuild.loading"
+                        size="small"
+                        @click="
+                            rebuildImport({
+                                name: item.name,
+                            })
+                        "
+                    >
+                        重新构建
+                    </el-button>
                 </el-col>
             </el-row>
         </el-card>
@@ -76,11 +87,17 @@ const packages = useAsyncAction(async () => {
 });
 
 onMounted(() => {
-    console.log(user);
     packages.fetch(null);
 });
 const injectAndOpenImport = (data: any) => {
     importDialog.value.model = data;
     useMagicDialog().toggle("import-from-github-dialog");
+};
+const prebuild = useAsyncJSON<{ name: string }, never>(() => ({
+    url: "/api/prebuild-font",
+    method: "post",
+}));
+const rebuildImport = (data: any) => {
+    prebuild.fetch(data);
 };
 </script>

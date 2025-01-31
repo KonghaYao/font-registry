@@ -22,7 +22,7 @@ export default defineCompose(
     authLayer,
     validateJSON(schema),
     clearCacheLayer((event, result) => {
-        return ["nitro:handlers:_:packageslist.json"];
+        return ["nitro:handlers:_:_api_packages_list.json"];
     }),
     sseResponse(async (event) => {
         const sse = useSSE(event);
@@ -114,58 +114,60 @@ export default defineCompose(
         );
         sse.log(`导入 github release ${versionResult.data.length} 个`);
 
-        const assets = (
-            await Promise.all(
-                response.data.map(async (release, index) => {
-                    let zipFiles: any[] = [];
-                    let assetIds = release.assets.filter((i) => {
-                        if (i.content_type === "application/zip" || i.name.endsWith(".zip")) zipFiles.push(i);
-                        return (
-                            i.state === "uploaded" &&
-                            (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
-                        );
-                    });
+        const assets = [];
+        for (let index = 0; index < response.data.length; index++) {
+            const release = response.data[index];
+            let zipFiles: any[] = [];
+            let assetIds = release.assets.filter((i) => {
+                if (i.content_type === "application/zip" || i.name.endsWith(".zip")) zipFiles.push(i);
+                return (
+                    i.state === "uploaded" &&
+                    (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
+                );
+            });
 
-                    for (const zipFile of zipFiles) {
-                        const zip = new ZIPPath(zipFile.browser_download_url);
-                        await zip.cacheFetch();
-                        const filePaths = zip.getPaths();
-                        filePaths.forEach((path) => {
-                            if (["otf", "ttf"].some((ext) => path.endsWith(ext))) {
-                                assetIds.push({
-                                    name: path, // 这里可能有导致 url 不能使用的情况
-                                    browser_download_url: `/api/zip/get?url=${encodeURIComponent(
-                                        zipFile.browser_download_url
-                                    )}&path=${encodeURIComponent(path)}`,
-                                    size: zip.getFileSize(path),
-                                } as any);
-                            }
+            for (const zipFile of zipFiles) {
+                const zip = new ZIPPath(zipFile.browser_download_url);
+                const filePaths = await zip.getPaths();
+                filePaths.forEach(({ name: path, size }) => {
+                    if (["otf", "ttf"].some((ext) => path.endsWith(ext))) {
+                        /**@ts-ignore */
+                        assetIds.push({
+                            name: path,
+                            browser_download_url: `/api/zip/get?url=${encodeURIComponent(
+                                zipFile.browser_download_url
+                            )}&path=${encodeURIComponent(path)}`,
+                            size: size,
                         });
                     }
+                });
+            }
 
-                    return uniqBy(
-                        assetIds.map((asset) => ({
-                            version_id: versionResult.data[index].id,
-                            assets_name: asset.name,
-                            size: asset.size,
-                            download_url: asset.browser_download_url,
-                            user_id: userId,
-                        })),
-                        (i) => i.assets_name
-                    );
-                })
-            )
-        ).flat();
-        // 注入资源表
-        const assetsInsert = useSupabaseQuery(
-            await client
-                .from("assets")
-                .upsert(assets as any, {
-                    onConflict: "version_id,assets_name",
-                })
-                .select()
-        );
-        sse.log(`导入 github assets ${assetsInsert.data?.length} 个`);
+            // 使用 lodash 的 uniqBy 或其他方法去重
+            const uniqueAssets = uniqBy(
+                assetIds.map((asset) => ({
+                    version_id: versionResult.data[index].id,
+                    assets_name: asset.name,
+                    size: asset.size,
+                    download_url: asset.browser_download_url,
+                    user_id: userId,
+                })),
+                (i) => i.assets_name
+            );
+            // 注入资源表
+            const assetsInsert = useSupabaseQuery(
+                await client
+                    .from("assets")
+                    .upsert(uniqueAssets as any, {
+                        onConflict: "version_id,assets_name",
+                    })
+                    .select()
+            );
+            sse.log(`导入 github assets ${assetsInsert.data?.length} 个 | ${versionResult.data[index].version}`);
+            // 将当前循环的结果添加到最终的 assets 数组中
+            assets.push(...assetsInsert.data);
+        }
+
         useSupabaseQuery(
             await client
                 .from("packages")
@@ -177,7 +179,7 @@ export default defineCompose(
         return {
             package: pack.data[0],
             version: versionResult.data,
-            assets: assetsInsert.data,
+            assets: assets,
         };
     })
 );

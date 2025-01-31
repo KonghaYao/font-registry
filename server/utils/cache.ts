@@ -48,3 +48,8 @@ export const clearCacheLayer =
             console.log("清理缓存 \n", keys.join("\n  "));
         });
     };
+
+export const encodeKey = (str?: string) => {
+    if (!str) return "undefined_key";
+    return str.replace(/[\?\/=\&:]/g, "_");
+};

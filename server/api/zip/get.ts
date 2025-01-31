@@ -1,5 +1,5 @@
-import z, { output } from "zod";
-import { defineCompose, EndPoint, WrappedEventHandler } from "../../utils/compose";
+import z from "zod";
+import { defineCompose } from "../../utils/compose";
 import { useJSON, validateQuery } from "../../utils/validation";
 import { ZIPPath } from "../../utils/zip";
 import { hash } from "ohash";
@@ -25,7 +25,6 @@ const api = defineCompose(
         const params: z.infer<typeof schema> = useJSON(event);
         const url = decodeURIComponent(params.url);
         const zip = new ZIPPath(url);
-        await zip.cacheFetch();
         const data = await zip.getFile(decodeURIComponent(params.path));
         if (!data) throw new NotFoundError();
         return new Blob([data]);

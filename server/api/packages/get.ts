@@ -2,6 +2,8 @@ import z from "zod";
 import { defineCachedCompose } from "../../utils/compose";
 import { validateQuery, useJSON } from "../../utils/validation";
 import { serverSupabaseServiceRole } from "#supabase/server";
+import { H3Event } from "h3";
+import { encodeKey } from "~/server/utils/cache";
 export const schema = z.object({
     /* 查询参数 */
     pkgKey: z.string(),
@@ -23,6 +25,9 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
     return chain.data;
 })({
     maxAge: 10 * 60,
+    getKey: (event: H3Event) => {
+        return encodeKey(event.node.req.url);
+    },
 });
 export default api;
 

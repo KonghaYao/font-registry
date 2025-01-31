@@ -3,6 +3,7 @@ import { defineCachedCompose } from "../../utils/compose";
 import { validateQuery, useJSON } from "../../utils/validation";
 import { serverSupabaseServiceRole } from "#supabase/server";
 import { H3Event } from "h3";
+import { encodeKey } from "~/server/utils/cache";
 export const schema = z.object({
     /* 查询参数 */
     query: z.optional(z.string()),
@@ -24,8 +25,7 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
 })({
     maxAge: 10 * 60,
     getKey: (event: H3Event) => {
-        const url = new URL(event.node.req.url!, "http://localhost");
-        return `packages:list:${url.search}`;
+        return encodeKey(event.node.req.url);
     },
 });
 export default api;

@@ -21,8 +21,11 @@ export default defineCompose(
     authLayer,
     validateJSON(schema),
     // 清除隔壁的 版本查询接口 缓存，保证及时获取到信息
-    clearCacheLayer((event, result: { pkgId: string }) => {
-        return [`nitro:functions:_:version:${result.pkgId}.json`];
+    clearCacheLayer((event, result: { pkgId: string; name: string }) => {
+        return [
+            `nitro:functions:_:version:${result.pkgId}.json`,
+            `nitro:handlers:_:_api_packages_get_pkgKey_${result.name.replace("/", "_")}.json`,
+        ];
     }),
     async (event) => {
         const body: z.infer<typeof schema> = useJSON(event);
@@ -117,7 +120,7 @@ export default defineCompose(
             );
             return { ...style, pkgId: pkg.data.id.toString() };
         }
-        return { ...style, pkgId: pkg.data.id.toString() };
+        return { ...style, pkgId: pkg.data.id.toString(), name: body.name };
     }
 );
 async function sha256(message: string) {

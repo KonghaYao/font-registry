@@ -123,7 +123,8 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                     // if the server emits an error message, throw an exception
                     // so it gets handled by the onerror callback below:
                     if (msg.event === "Error") {
-                        throw new Error(msg.data);
+                        rej(new Error(msg.data));
+                        return;
                     }
                     if (msg.event === "End") {
                         const finalData = JSON.parse(msg.data);
@@ -136,7 +137,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                     events?.onReceive?.(message, input);
                 },
                 onerror(err) {
-                    throw err;
+                    rej(err);
                 },
                 body: data.method === "post" ? JSON.stringify(data.body) : undefined,
             }).catch((err) => {

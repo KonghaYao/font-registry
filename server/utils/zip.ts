@@ -1,37 +1,21 @@
-import JSZip from "jszip";
-
 export class ZIPPath {
-    static cache = useStorage<ArrayBuffer>("cache");
     constructor(public url: string) {}
-
-    getResult(): Promise<Uint8Array | undefined | null> {
-        return ZIPPath.cache.getItemRaw(this.url);
-    }
-    setResult(value: Uint8Array) {
-        ZIPPath.cache.setItemRaw(this.url, value);
-    }
-    zip: JSZip | undefined;
-    async cacheFetch() {
-        const cache = await this.getResult();
-        if (cache) {
-            this.zip = await new JSZip().loadAsync(cache);
-            return;
-        }
-        const res = await fetch(this.url);
-        const blob = new Uint8Array(await res.arrayBuffer());
-        this.setResult(blob);
-        this.zip = await new JSZip().loadAsync(blob);
-    }
     getPaths() {
-        const all: string[] = [];
-        this.zip?.forEach((path, file) => all.push(path));
-        return all;
+        const url = new URL("/list", useRuntimeConfig().NUXT_ZIP_SERVER);
+        url.searchParams.set("url", encodeURIComponent(this.url));
+        return fetch(url).then<
+            {
+                name: string;
+                size: number;
+            }[]
+        >((res) => res.json());
     }
     getFile(innerPath: string) {
-        return this.zip?.file(innerPath)?.async("uint8array");
-    }
-    getFileSize(innerPath: string): number {
-        /** @ts-ignore */
-        return this.zip?.file(innerPath)?._data?.uncompressedSize;
+        const url = new URL("/get", useRuntimeConfig().NUXT_ZIP_SERVER);
+        url.searchParams.set("url", encodeURIComponent(this.url));
+        url.searchParams.set("path", encodeURIComponent(innerPath));
+        return fetch(url)
+            .then((res) => res.arrayBuffer())
+            .then((res) => new Uint8Array(res));
     }
 }

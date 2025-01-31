@@ -9,7 +9,6 @@ export const schema = z.object({
 export default defineCachedCompose(validateQuery(schema), async (event) => {
     const params: z.infer<typeof schema> = useJSON(event);
     const zip = new ZIPPath(decodeURIComponent(params.url));
-    await zip.cacheFetch();
     return zip.getPaths();
 })({
     maxAge: 30 * 24 * 60 * 60,
