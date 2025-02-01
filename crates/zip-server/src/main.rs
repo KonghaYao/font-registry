@@ -115,15 +115,11 @@ async fn get_cached_zip_file(decoded_url: &str) -> Vec<u8> {
             Err(_) => (),
         }
     }
-    // 下载 ZIP 文件
-    let resp = reqwest::get(decoded_url)
-        .await
+    // 发起 GET 请求
+    let resp = attohttpc::get(decoded_url)
+        .send()
         .expect("Failed to fetch the zip file");
-    let binary = resp
-        .bytes()
-        .await
-        .expect("Failed to read the zip data")
-        .to_vec();
+    let binary = resp.bytes().expect("Failed to read the zip data").to_vec();
     fs::write(path_str, &binary).expect("写入失败");
     binary
 }
@@ -143,40 +139,30 @@ async fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use reqwest::{Body, Client};
     use serde_json::json;
 
     #[tokio::test]
     async fn test_submit_endpoint() {
-        // 创建 HTTP 客户端
-        let client = Client::new();
-
         // 发送 POST 请求
-        let res = client
-            .get("http://localhost:3000/list?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip")
+        let res =attohttpc::get("http://localhost:3000/list?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip")
             .send()
-            .await
             .expect("Failed to execute request.");
 
         // 将响应内容写入文件
-        let data = res.text().await.unwrap();
+        let data = res.text().unwrap();
 
         assert_eq!(data.len(), 471)
     }
     #[tokio::test]
     async fn test_get_endpoint() {
-        // 创建 HTTP 客户端
-        let client = Client::new();
-
         // 发送 POST 请求
-        let res = client
-            .get("http://localhost:3000/get?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip&path=lxgw-wenkai-v1.510%2FOFL.txt")
+        let res = attohttpc
+            ::get("http://localhost:3000/get?url=https%3A%2F%2Fgithub.com%2Flxgw%2FLxgwWenKai%2Freleases%2Fdownload%2Fv1.510%2Flxgw-wenkai-v1.510.zip&path=lxgw-wenkai-v1.510%2FOFL.txt")
             .send()
-            .await
             .expect("Failed to execute request.");
 
         // 将响应内容写入文件
-        let data = res.text().await.unwrap();
+        let data = res.text().unwrap();
 
         assert_eq!(data.len(), 4448)
     }
