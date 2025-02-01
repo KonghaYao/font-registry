@@ -34,7 +34,7 @@ WORKDIR /app
 RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/' /etc/apt/sources.list
 RUN apt update && apt install -y openssl ca-certificates
 RUN update-ca-certificates
-COPY --from=builder /app/target/release/server ./
+COPY --from=builder /app/target/release/zip-server ./
 
 EXPOSE 3000
-CMD ["/app/server"]
+CMD ["/app/zip-server"]
