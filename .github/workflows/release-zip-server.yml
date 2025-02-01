@@ -30,5 +30,4 @@ jobs:
               run: docker build . --tag ghcr.io/${{inputs.version}}
 
             - name: Push the Docker image
-              permissions: write-all
               run: docker push ghcr.io/${{inputs.version}}
