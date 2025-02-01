@@ -7,10 +7,10 @@ on:
                 description: "container"
                 required: true
                 default: "konghayao/zip-server:1.0.0"
-        dir:
-            version:
-                description: "dir"
-                default: "./crates/zip-server"
+            dir:
+                version:
+                    description: "dir"
+                    default: "./crates/zip-server"
 jobs:
     build:
         runs-on: ubuntu-latest
