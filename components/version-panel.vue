@@ -59,17 +59,10 @@ defineExpose({
                 <span class="text-gray-600 text-sm px-4">
                     {{ new Date(item.created_at).toLocaleString() }}
                 </span>
-                <!-- <el-popover width="50%" trigger="click" placement="bottom">
-                    <template #reference>
-                        <UIcon name="material-symbols:info-rounded" class="w-5 h-5 text-gray-600 cursor-pointer" />
-                    </template>
-                    <div class="text-xl font-bold my-2">版本说明</div>
-                    <MDC class="markdown-body py-4" :value="item.description || ''" tag="div" />
-                </el-popover> -->
             </div>
             <ul>
                 <li
-                    v-for="(asset, index) in item.assets"
+                    v-for="(asset, index) in item.assets.sort((a:any, b:any) => b.assets_name.localeCompare(a.assets_name))"
                     class="flex justify-between gap-4 hover:bg-primary-50 transition-all px-4"
                 >
                     <span>
@@ -79,7 +72,9 @@ defineExpose({
                     <span class="text-gray-500 flex-none">
                         <!-- 文件 icon -->
                         <UIcon name="icon-park-outline:file-collection-one" class="w-5 h-5" />
-                        {{ prettyBytes(asset.size) }}
+                        <span class="inline-block w-20 text-right">
+                            {{ prettyBytes(asset.size) }}
+                        </span>
                     </span>
                     <a target="_blank" :href="asset.download_url" class="text-primary-500 flex-none">
                         <UIcon name="icon-park-outline:download-one" class="w-5 h-5" />
@@ -114,9 +109,6 @@ defineExpose({
                         <UIcon name="vscode-icons:file-type-css" class="w-5 h-5" />
                         <span> 构建 CSS </span>
                     </div>
-                    <span class="text-gray-400 flex-none">
-                        {{ new Date(item.created_at).toLocaleString() }}
-                    </span>
                 </li>
             </ul>
         </li>

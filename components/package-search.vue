@@ -16,7 +16,7 @@ const handleSelect = (item: Record<string, any>) => {
 
 <template>
     <div
-        class="hover:bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b sticky left-0 top-24 lg:top-16 z-40 flex justify-center"
+        class="hover:bg-gray-50 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 border-b sticky left-0 top-24 lg:top-16 z-40 flex justify-center backdrop-blur-lg"
     >
         <el-autocomplete
             class="flex-none max-w-4xl w-full"

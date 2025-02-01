@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import "github-markdown-css/github-markdown.css";
+import "github-markdown-css/github-markdown-light.css";
 import { createFontLink } from "~/composables/useFont";
 import type PackageType from "#server-endpoint/api/packages/get.ts";
 definePageMeta({
@@ -52,11 +52,11 @@ useHead({
             fontWeight: fontInfoOfStyle.weight,
         }"
     >
-        <div class="my-6 p-8 bg-blue-50">
-            <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-4">
+        <div class="my-6 p-4 border">
+            <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-2">
                 <package-name :name="pkgDetail?.name!" :name_cn="pkgDetail?.name_cn!"></package-name>
             </div>
-            <div class="mb-6">
+            <div class="mb-4">
                 {{ pkgDetail?.description }}
             </div>
             <PackageDetailRow :pack="pkgDetail!"></PackageDetailRow>
