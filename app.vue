@@ -75,12 +75,18 @@ body {
     --el-card-border-radius: 8px !important;
     @apply bg-white;
 }
-.el-dialog__header {
-    border-bottom: 1px solid #dedede;
-    margin-bottom: 1rem;
+.el-dialog {
+    border: 1px solid #e1e1e1;
 }
 .el-form-item__label {
     padding: 0 1rem 0 0;
+}
+
+.el-form-item__error {
+    left: 0.3rem !important;
+    top: -0.5rem !important;
+    background: white;
+    padding: 0px 0.2rem;
 }
 .h-page {
     height: calc(100vh - 98px);
@@ -97,5 +103,8 @@ body {
 .page-enter,
 .page-leave-active {
     opacity: 0;
+}
+* {
+    @apply transition-all;
 }
 </style>

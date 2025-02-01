@@ -86,6 +86,7 @@ export function useAsyncJSON<Input, Output, Message = Output>(
 }
 export type SSEActionType<Message> = ActionType & {
     message: Message | undefined;
+    messageStack: Message[];
 };
 export function useAsyncSSEJSON<Input, Output, Message>(
     fn: (input: Input) => {
@@ -102,6 +103,8 @@ export function useAsyncSSEJSON<Input, Output, Message>(
             const qs = new URLSearchParams(Object.entries(data.body as any));
             data.url += "?" + qs.toString();
         }
+        action.message = "";
+        action.messageStack = [];
         return new Promise<Output>((res, rej) => {
             fetchEventSource(data.url, {
                 method: data.method,
@@ -134,6 +137,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                     }
                     const message = JSON.parse(msg.data) as Message;
                     action.message = message;
+                    action.messageStack.unshift(message);
                     events?.onReceive?.(message, input);
                 },
                 onerror(err) {

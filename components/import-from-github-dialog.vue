@@ -31,6 +31,19 @@ const imported = useAsyncSSEJSON<Import.Input, Import.Output, string>(
 
 const configs: UnionConfig[] = [
     {
+        label: "自动识别 github 地址",
+        value: "auto_detect",
+        type: "input",
+        placeholder: "格式如 https://github.com/KonghaYao/cn-font-split，失焦后自动识别",
+        change(value, formValue) {
+            if (value.includes("/")) {
+                const [_, name, repo] = value.match(/github.com\/([^\/]+)\/([^\/]+)/) || [];
+                formValue.name = name;
+                formValue.repo = repo;
+            }
+        },
+    },
+    {
         label: "Github 用户名",
         value: "name",
         type: "input",

@@ -1,36 +1,27 @@
 <template>
-    <div class="py-8 flex flex-col gap-4 max-w-xl mx-auto">
-        <el-card class="w-full p-4">
-            <template #header>
-                <div class="font-bold text-2xl">用户信息</div>
-            </template>
-            <el-row>
-                <el-col :span="24" v-for="item in config" :key="item.name" class="mb-4">
-                    <div class="flex justify-between">
-                        <div class="font-bold">{{ item.name }}</div>
+    <div class="my-8 flex flex-col max-w-xl mx-auto border divide-y">
+        <div class="w-full">
+            <div class="hover:bg-gray-50 font-bold text-2xl p-4 pt-8 border-b">用户信息</div>
+            <ul class="flex flex-col divide-y">
+                <li :span="24" v-for="item in config" :key="item.name" class="hover:bg-gray-50 px-4 py-2">
+                    <div class="flex justify-between w-full">
+                        <div class="font-bold text-gray-700">{{ item.name }}</div>
                         <div>{{ item.value }}</div>
                     </div>
-                </el-col>
-            </el-row>
-        </el-card>
-        <el-card class="w-full p-4">
-            <template #header>
-                <div class="flex justify-between">
-                    <div class="font-bold text-2xl">Packages</div>
-                    <el-button @click="useMagicDialog().toggle('import-from-github-dialog')">
-                        从 github 导入
-                    </el-button>
-                </div>
-            </template>
-            <el-row>
-                <el-col :span="24" v-for="item in packages.data" :key="item.id" class="mb-4">
-                    <a :href="'/packages/' + item.name" class="flex gap-4 justify-between">
+                </li>
+            </ul>
+        </div>
+        <div class="w-full">
+            <div class="hover:bg-gray-50 flex justify-between p-4 pt-8 border-b">
+                <div class="font-bold text-2xl">Packages</div>
+                <el-button @click="useMagicDialog().toggle('import-from-github-dialog')"> 从 github 导入 </el-button>
+            </div>
+            <ul class="flex flex-col divide-y">
+                <li :span="24" v-for="item in packages.data" :key="item.id" class="hover:bg-gray-50 flex px-4 py-2">
+                    <a :href="'/packages/' + item.name" class="flex-1 text-gray-700">
                         <span class="font-bold">{{ item.name_cn }}</span>
-                        <span>{{ item.name }}</span>
                     </a>
-                    <el-tag :type="item.is_published ? 'success' : 'danger'">{{
-                        item.is_published ? "已发布" : "未发布"
-                    }}</el-tag>
+
                     <el-button
                         size="small"
                         @click="
@@ -55,9 +46,12 @@
                     >
                         重新构建
                     </el-button>
-                </el-col>
-            </el-row>
-        </el-card>
+                    <el-tag :type="item.is_published ? 'success' : 'danger'">{{
+                        item.is_published ? "已发布" : "未发布"
+                    }}</el-tag>
+                </li>
+            </ul>
+        </div>
         <import-from-github-dialog ref="importDialog" />
     </div>
 </template>
