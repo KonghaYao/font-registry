@@ -1,0 +1,34 @@
+name: Docker Image CI - zip-server
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "container"
+                required: true
+                default: "konghayao/zip-server:1.0.0"
+        dir:
+            version:
+                description: "dir"
+                default: "./crates/zip-server"
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Log in to GHCR
+              uses: docker/login-action@v2
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build the Docker image
+              working-directory: ${{ inputs.dir }}
+              run: docker build . --tag ghcr.io/${{inputs.version}}
+
+            - name: Push the Docker image
+              run: docker push ghcr.io/${{inputs.version}}
