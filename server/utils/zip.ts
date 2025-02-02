@@ -3,6 +3,7 @@ export class ZIPPath {
     getPaths() {
         const url = new URL("/list", useRuntimeConfig().NUXT_ZIP_SERVER);
         url.searchParams.set("url", encodeURIComponent(this.url));
+        console.log(url.toString());
         return fetch(url).then<
             {
                 name: string;

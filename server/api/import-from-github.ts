@@ -119,7 +119,8 @@ export default defineCompose(
             const release = response.data[index];
             let zipFiles: any[] = [];
             let assetIds = release.assets.filter((i) => {
-                if (i.content_type === "application/zip" || i.name.endsWith(".zip")) zipFiles.push(i);
+                if (i.content_type === "application/zip" || i.name.endsWith(".zip") || i.name.endsWith(".7z"))
+                    zipFiles.push(i);
                 return (
                     i.state === "uploaded" &&
                     (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
