@@ -18,15 +18,16 @@ impl ZIPLike for SevenZAdapter {
         .expect("7z open error");
         let mut content_result: Vec<ContentResult> = Vec::with_capacity(1);
         let _ = obj.for_each_entries(|entry, reader| {
+            let mut content = Vec::new();
+            reader.read_to_end(&mut content).unwrap();
             if entry.name().to_string() == path {
-                let mut content = Vec::new();
-                reader.read_to_end(&mut content).unwrap();
                 content_result.push(ContentResult {
                     content,
                     name: entry.name().to_string(),
-                })
+                });
+                return Ok(false);
             }
-            Ok(false)
+            Ok(true)
         });
         if content_result.is_empty() {
             return Err("path not found".to_string());
