@@ -37,6 +37,7 @@
         "set-immediate-shim": "^3.1.0",
         "turndown": "^7.2.0",
         "unenv": "^1.10.0",
+        "vditor": "^3.10.8",
         "vue": "latest",
         "vue-router": "latest",
         "zod": "^3.24.1"

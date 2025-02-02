@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FormInstance } from "element-plus";
-import { type UnionConfig } from "../composables/interface";
+import { type BaseConfig, type UnionConfig } from "../composables/interface";
+
 import { computed } from "vue";
 const props = defineProps<{
     config: UnionConfig[];
@@ -35,6 +36,9 @@ const submitForm = async () => {
         }
     });
 };
+const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
+    return type.includes(value.type!);
+};
 </script>
 
 <template>
@@ -48,12 +52,46 @@ const submitForm = async () => {
             :rules="item.rules"
         >
             <el-input
-                v-if="item.type === 'input'"
+                v-if="isType(item, ['input', 'textarea'] as const)"
                 v-model="modelValue[item.value]"
                 :type="item.type"
+                :show-word-limit="!!item.maxlength"
+                :maxlength="item.maxlength"
                 :placeholder="item.placeholder ?? '请输入' + item.label"
                 @change="item.change?.(modelValue[item.value], modelValue)"
-            />
+                :clearable="true"
+            >
+                <template #append>
+                    <el-button v-if="item.buttonClick" @click="item.buttonClick?.(modelValue[item.value], modelValue)"
+                        >确认</el-button
+                    >
+                </template>
+            </el-input>
+            <el-select
+                v-else-if="isType(item, ['select','tags'] as const)"
+                v-model="modelValue[item.value]"
+                :placeholder="item.placeholder ?? '请选择' + item.label"
+                :multiple="isType(item, ['tags'] as const)"
+                @change="item.change?.(modelValue[item.value], modelValue)"
+                :filterable="true"
+                :clearable="true"
+                :allow-create="isType(item, ['tags'] as const)"
+            >
+                <el-option
+                    v-for="option in item.options"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                />
+            </el-select>
+            <slot
+                v-else-if="isType(item, ['custom'])"
+                v-bind="{
+                    modelValue,
+                    config: item,
+                }"
+                name="custom"
+            ></slot>
             <span v-else>
                 {{ showValue(modelValue[item.value], item) }}
             </span>
@@ -65,3 +103,10 @@ const submitForm = async () => {
         <el-alert v-if="message && submit.loading" :title="message" type="warning" />
     </el-form>
 </template>
+
+<style>
+svg.md-editor-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+</style>

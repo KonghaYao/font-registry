@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { Readability } from "@mozilla/readability";
+import { Window } from "happy-dom";
+import TurndownService from "turndown";
 export const schema = z.object({
     url: z.string().url(),
 });
@@ -8,14 +11,12 @@ export default defineCompose(authLayer, validateJSON(schema), async (event) => {
     const htmlText = extractReadableContent(data) ?? data;
     const turndownService = new TurndownService({
         headingStyle: "atx",
+        codeBlockStyle: "fenced",
     });
     const markdown = turndownService.turndown(htmlText);
     return markdown;
 });
-// plugins/readabilityService.js
-import { Readability } from "@mozilla/readability";
-import { Window } from "happy-dom";
-import TurndownService from "turndown";
+
 export function extractReadableContent(html: string) {
     // 创建一个新的 happy-dom 实例
     const window = new Window();
