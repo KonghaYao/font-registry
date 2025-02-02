@@ -81,6 +81,15 @@ importers:
       '@element-plus/nuxt':
         specifier: ^1.1.1
         version: 1.1.1(@element-plus/icons-vue@2.3.1(vue@3.5.13(typescript@5.7.3)))(element-plus@2.9.3(vue@3.5.13(typescript@5.7.3)))(magicast@0.3.5)(rollup@4.30.1)
+      '@iconify-json/ant-design':
+        specifier: ^1.2.5
+        version: 1.2.5
+      '@iconify-json/icon-park-outline':
+        specifier: ^1.2.2
+        version: 1.2.2
+      '@iconify-json/vscode-icons':
+        specifier: ^1.2.11
+        version: 1.2.11
       '@types/koa-compose':
         specifier: ^3.2.8
         version: 3.2.8
@@ -596,8 +605,17 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
+  '@iconify-json/ant-design@1.2.5':
+    resolution: {integrity: sha512-SYxhrx1AFq2MBcXk77AERYz2mPhLQes1F0vtvG64+dJZWyge9studXo7MiR8PPeLjRjZdWRrReRbxiwdRMf70Q==}
+
   '@iconify-json/heroicons@1.2.2':
     resolution: {integrity: sha512-qoW4pXr5kTTL6juEjgTs83OJIwpePu7q1tdtKVEdj+i0zyyVHgg/dd9grsXJQnpTpBt6/VwNjrXBvFjRsKPENg==}
+
+  '@iconify-json/icon-park-outline@1.2.2':
+    resolution: {integrity: sha512-7VkMWOZTIMNkC9+oAL4I5kVlVC5Pq3nQpruZ4E3cLyKaeV95gaUrEilUkvGW71fgsFYCBWAmOZ3KpM4ux0j0zA==}
+
+  '@iconify-json/vscode-icons@1.2.11':
+    resolution: {integrity: sha512-V0ldtWPUKe7ZB3CV/TjgDW1Gbz74AxjGPS2NBWDTSn/y25gTwFycI1YcrluDhuVSoQpDEIYmm3JQJkhtSefh7A==}
 
   '@iconify/collections@1.0.505':
     resolution: {integrity: sha512-v5sk7zCcHRcRY7y87wE0WGaZ74l328UBJzj3X6pC4VR5ao/FM7zUMpzkELXLeyVfFZWV2TZnsPKf6P7R1dXZlw==}
@@ -5026,7 +5044,19 @@ snapshots:
       '@tanstack/vue-virtual': 3.11.2(vue@3.5.13(typescript@5.7.3))
       vue: 3.5.13(typescript@5.7.3)
 
+  '@iconify-json/ant-design@1.2.5':
+    dependencies:
+      '@iconify/types': 2.0.0
+
   '@iconify-json/heroicons@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/icon-park-outline@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/vscode-icons@1.2.11':
     dependencies:
       '@iconify/types': 2.0.0
 

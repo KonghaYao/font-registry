@@ -1,4 +1,3 @@
-import { fetchEventSource } from "@ai-zen/node-fetch-event-source";
 export interface AsyncState<Input, Output> {
     data: Output | null;
     error: Error | null;
@@ -105,7 +104,8 @@ export function useAsyncSSEJSON<Input, Output, Message>(
         }
         action.message = "";
         action.messageStack = [];
-        return new Promise<Output>((res, rej) => {
+        return new Promise<Output>(async (res, rej) => {
+            const { fetchEventSource } = await import("@ai-zen/node-fetch-event-source");
             fetchEventSource(data.url, {
                 method: data.method,
                 headers: {

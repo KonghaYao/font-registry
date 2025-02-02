@@ -69,6 +69,11 @@ export class DatabaseError extends CustomError {
         super("DatabaseError", 500, description, true);
     }
 }
+export class NetworkResourceError extends CustomError {
+    constructor(description = "NetworkResourceError") {
+        super("NetworkResourceError", 500, description, true);
+    }
+}
 
 /**
  * 自动处理 supabase 产出的错误

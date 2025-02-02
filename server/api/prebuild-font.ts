@@ -5,7 +5,7 @@ import { decodeReporter } from "cn-font-split/dist/createAPI";
 import { defineCompose } from "../utils/compose";
 import { authLayer } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
-import { useSupabaseQuery } from "../utils/Errors";
+import { NetworkResourceError, NotFoundError, useSupabaseQuery } from "../utils/Errors";
 import { clearCacheLayer } from "../utils/cache";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
@@ -95,17 +95,26 @@ export default defineCompose(
                     file_folder,
                 }),
             })
-                .then((res) => res.text())
+                .then((res) => {
+                    if (!res.ok)
+                        throw new NetworkResourceError(
+                            "访问资源报错 " + useRuntimeConfig().NUXT_SPLIT_SERVER + "/upload" + " " + res.statusText
+                        );
+                    return res.text();
+                })
                 .then((res) => {
                     console.log(res);
                 });
 
             console.log("构建完成", file_folder);
 
-            const bin = await fetch(useRuntimeConfig().NUXT_OSS_ROOT + file_folder + "reporter.bin").then((res) =>
-                res.arrayBuffer()
-            );
+            const reporterPath = useRuntimeConfig().NUXT_OSS_ROOT + file_folder + "reporter.bin";
+            const bin = await fetch(reporterPath).then((res) => {
+                if (!res.ok) throw new NetworkResourceError("访问资源报错 " + reporterPath);
+                return res.arrayBuffer();
+            });
             const reporter = decodeReporter(new Uint8Array(bin));
+            console.log(reporterPath);
             const style = {
                 version: version.data.version,
                 file_name: asset.assets_name,

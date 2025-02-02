@@ -31,7 +31,7 @@ defineProps<{
         </div>
         <time datetime="{{ pack.created_at }}" class="hover:text-gray-900">
             <UIcon name="icon-park-outline:calendar" class="scale-150 mr-2" />
-            {{ new Date(pack.created_at).toLocaleString() }}
+            {{ new Date(pack.created_at).toLocaleDateString() }}
         </time>
     </div>
 </template>

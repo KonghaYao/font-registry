@@ -1,4 +1,5 @@
 import { cacheLayer } from "~/server/utils/cache";
+import { useAfterResponse } from "~/server/utils/compose";
 import { getContentType } from "~/server/utils/contentType";
 import { NotFoundError } from "~/server/utils/Errors";
 
