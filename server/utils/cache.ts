@@ -14,7 +14,6 @@ export const cacheLayer =
         let key = cacheConfig.getKey?.() ?? event.node.req.url!;
         if (!key) throw new VoidError("Cache Key is void");
         key = encodeKey(key);
-        console.log(key);
         if (cacheConfig.before) await cacheConfig.before(event);
         if (await store.hasItem(key)) {
             const data = await store.getItemRaw(key);

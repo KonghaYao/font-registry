@@ -15,7 +15,7 @@ onMounted(() => {
     PackagesData.fetch({});
 });
 const getPreviewLink = (pkgName: string, style: any) => {
-    let base = new URL(createFontLink(pkgName, style.version, style.file_name), location.href);
+    let base = createFontLink(pkgName, style.version, style.file_name);
     return new URL("./preview.svg", base).toString();
 };
 </script>
