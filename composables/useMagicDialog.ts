@@ -1,4 +1,9 @@
-const h = new Map<string, Ref<boolean>>();
+import { onMounted } from "vue";
+
+/** @ts-ignore */
+globalThis._dialog_store = globalThis._dialog_store || new Map<string, Ref<boolean>>();
+/** @ts-ignore */
+let h: Map<string, Ref<boolean>> = globalThis._dialog_store;
 export const useMagicDialog = () => {
     const toggle = (id: string, flag?: boolean) => {
         const val = h.get(id);
@@ -13,7 +18,9 @@ export const useMagicDialog = () => {
     };
     return {
         register(id: string, ref: Ref<boolean>) {
-            h.set(id, ref);
+            onMounted(() => {
+                h.set(id, ref);
+            });
             onUnmounted(() => {
                 h.delete(id);
             });
