@@ -11,9 +11,10 @@ export const cacheLayer =
     ): ComposeEventHandler =>
     async (event) => {
         const store = useStorage("cache");
-        let key = cacheConfig.getKey?.() ?? event.node.req.originalUrl!;
+        let key = cacheConfig.getKey?.() ?? event.node.req.url!;
         if (!key) throw new VoidError("Cache Key is void");
         key = encodeKey(key);
+        console.log(key);
         if (cacheConfig.before) await cacheConfig.before(event);
         if (await store.hasItem(key)) {
             const data = await store.getItemRaw(key);
@@ -51,5 +52,5 @@ export const clearCacheLayer =
 
 export const encodeKey = (str?: string) => {
     if (!str) return "undefined_key";
-    return str.replace(/[\?\/=\&:]/g, "_");
+    return decodeURIComponent(str).replace(/[\?\/=\&:]/g, "_");
 };
