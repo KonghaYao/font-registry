@@ -61,10 +61,8 @@ const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
                 @change="item.change?.(modelValue[item.value], modelValue)"
                 :clearable="true"
             >
-                <template #append>
-                    <el-button v-if="item.buttonClick" @click="item.buttonClick?.(modelValue[item.value], modelValue)"
-                        >确认</el-button
-                    >
+                <template #append v-if="item.buttonClick">
+                    <el-button @click="item.buttonClick?.(modelValue[item.value], modelValue)">确认</el-button>
                 </template>
             </el-input>
             <el-select
