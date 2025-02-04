@@ -47,6 +47,7 @@ export interface RequestType<Input> {
     url: string;
     method?: "get" | "post";
     body?: Input;
+    clearNullKey?: boolean;
 }
 export function useAsyncJSON<Input, Output, Message = Output>(
     fn: (input: Input) => RequestType<Input> | Promise<RequestType<Input>>,
@@ -61,7 +62,7 @@ export function useAsyncJSON<Input, Output, Message = Output>(
                 /** @ts-ignore */
                 const response: Response = err.response;
                 /** @ts-ignore */
-                return ElMessage.error(response._data.statusMessage);
+                return ElMessage.error(response._data.message || response._data.statusMessage);
             }
             ElMessage.error("请求失败: " + err.message);
         });
@@ -69,6 +70,10 @@ export function useAsyncJSON<Input, Output, Message = Output>(
         const data = await fn(input);
         data.body = data.body ?? input;
         data.method = data.method ?? "get";
+        if (data.clearNullKey && data.body) {
+            /** @ts-ignore */
+            data.body = removeNulls(data.body);
+        }
 
         return $fetch(data.url, {
             method: data.method,

@@ -5,8 +5,6 @@ export interface InputConfig extends BaseConfig {
     type: "input" | "textarea";
     maxlength?: number;
     buttonClick?: (value: string, model: any) => Promise<void> | void;
-    /** 纯文本展示转化 */
-    display?: (value: string) => string;
 }
 export interface SelectConfig extends BaseConfig {
     type: "select" | "tags";
@@ -24,5 +22,8 @@ export interface BaseConfig {
     type?: string;
     placeholder?: string;
     rules?: Array<FormItemRule>;
+    span?: number;
     change?: (value: string, formValue: any) => void;
+    /** 纯文本展示转化 */
+    display?: (value: string) => string;
 }

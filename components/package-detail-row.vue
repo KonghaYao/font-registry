@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
     <div class="p-2 text-sm text-gray-500 flex items-center gap-4 transition-all">
-        <a v-if="pack.author?.link" :href="pack.author?.link || ''" class="flex gap-2 flex-1">
+        <a :href="pack.author?.link || ''" class="flex gap-2 flex-1">
             <img
                 v-if="pack.author?.avatar"
                 class="w-5 h-5 rounded-full overflow-hidden object-fit"
@@ -15,7 +15,7 @@ defineProps<{
                 alt="avatar"
             />
 
-            {{ pack.author?.name }}
+            {{ pack.author?.name || "未知" }}
         </a>
         <slot></slot>
         <NuxtLink v-if="pack?.from === 'github_api'" :to="'https://github.com/' + pack?.name">

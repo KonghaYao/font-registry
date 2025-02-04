@@ -32,11 +32,15 @@ export class CustomError extends Error {
             console.error("Failed to capture stack trace:", error);
         }
     }
+    debugMessage: any;
+    setDebugMessage(debug: any) {
+        this.debugMessage = debug;
+    }
     toH3Error() {
         return createError({
             status: this.httpCode,
-            statusMessage: this.message,
             message: this.message,
+            data: this.debugMessage,
         });
     }
 }
@@ -48,8 +52,9 @@ export class AuthorizationError extends CustomError {
 }
 
 export class ValidationError extends CustomError {
-    constructor(description = "Invalid Query or body") {
+    constructor(description = "Invalid Query or body", data: any) {
         super("ValidationError", 412, description, true);
+        this.setDebugMessage(data);
     }
 }
 export class VoidError extends CustomError {
