@@ -7,6 +7,7 @@ const props = defineProps<{
     config: UnionConfig[];
     modelValue: any;
     title?: string;
+    subtitle?: string;
     submitAction: (input: any) => Promise<any>;
     message?: string;
 }>();
@@ -45,6 +46,7 @@ const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
 <template>
     <el-form ref="formEl" label-position="top" :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
         <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
+        <h4 class="text-center mt-2 mb-4 text-gray-500" v-if="subtitle">{{ subtitle }}</h4>
         <el-row :gutter="16">
             <el-col :span="item.span ?? 24" v-for="item in config" :key="item.value">
                 <el-form-item :prop="item.value" :label="item.label" :rules="item.rules">

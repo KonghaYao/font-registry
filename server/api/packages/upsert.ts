@@ -35,7 +35,9 @@ const api = defineCompose(authLayer, validateJSON(UpsertPackageSchema), async (e
     let resultItem;
     if ("dryRun" in data) {
         if (data.dryRun) {
-            resultItem = useSupabaseQuery(await client.from("packages").select().eq("id", data.id).single()).data;
+            resultItem = useSupabaseQuery(
+                await client.from("packages").select("*,versions!left(id,version)").eq("id", data.id).single()
+            ).data;
         } else {
             throw new NotFoundError();
         }

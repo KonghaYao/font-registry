@@ -6,8 +6,7 @@ definePageMeta({
 const route = useRoute();
 let pkgId: number | undefined = parseInt(route.params.pkgId as string);
 if (isNaN(pkgId)) pkgId = undefined;
-console.log(route.params.versionId);
-let versionId: number | undefined = parseInt(route.params.versionId as string);
+let versionId: number | undefined = parseInt(route.params.versionId[0] as string);
 if (isNaN(versionId)) versionId = undefined;
 </script>
 <template>

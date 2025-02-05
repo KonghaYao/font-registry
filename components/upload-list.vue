@@ -5,7 +5,7 @@ import XHR from "@uppy/xhr-upload";
 import prettyBytes from "pretty-bytes";
 import "@uppy/core/dist/style.css";
 import "@uppy/dashboard/dist/style.css";
-
+import zh from "@uppy/locales/src/zh_CN";
 const props = defineProps<{
     assetsList: any[];
     versionId: number;
@@ -19,7 +19,9 @@ const saveAssetsAction = useAsyncJSON(async () => {
     };
 });
 
-const uppy = new Uppy();
+const uppy = new Uppy({
+    locale: zh,
+});
 uppy.setOptions({
     restrictions: {
         maxFileSize: 1024 * 1024 * 50,
@@ -55,7 +57,8 @@ const deleteAsset = async (asset: any) => {
 
 <template>
     <div class="flex flex-col gap-4 items-center upload-list" v-loading="saveAssetsAction.loading">
-        <Dashboard :uppy="uppy" class="w-full h-32" />
+        <h3 class="text-center mt-2 mb-4 text-xl font-bold">字体文件列表</h3>
+        <Dashboard :uppy="uppy" class="w-full h-64" />
         <ul class="p-4 flex flex-col w-full">
             <li class="flex py-1 gap-2 items-center hover:bg-gray-100" v-for="asset in assetsList" :key="asset.id">
                 <span>

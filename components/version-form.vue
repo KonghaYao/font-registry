@@ -69,6 +69,9 @@ const upsertAction = useAsyncJSON<Upsert.Input, Upsert.Output>(
 
 const submit = async (data: any) => {
     await upsertAction.fetch({ ...data, package_id: props.pkgId, id: props.id });
+    if (!props.id) {
+        useRouter().push(`/edit/version/${props.pkgId}/${model.value.id}`);
+    }
 };
 const onUploadImg = async (files: File[], callback: (urls: string[]) => void) => {
     ElMessage.warning("暂时不支持上传图片");
@@ -83,6 +86,7 @@ const onUploadImg = async (files: File[], callback: (urls: string[]) => void) =>
         v-model="model"
         :submit-action="submit"
         :title="(isEditMode ? '编辑版本' : '新增版本') + ` ${pkgData.name_cn || ''}`"
+        :subtitle="isEditMode ? '' : '请发布您的版本，然后可以上传您的字体文件'"
     >
         <template #custom="{ modelValue, config }">
             <div v-if="config.key === 'markdown'" class="w-full overflow-hidden">

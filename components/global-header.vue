@@ -20,6 +20,12 @@ const userDropdowns = computed(() => [
                 useRouter().push("/user");
             },
         },
+        {
+            label: "新增字体包",
+            click() {
+                useRouter().push("/edit/packages");
+            },
+        },
     ],
     [
         {

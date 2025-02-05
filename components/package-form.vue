@@ -151,13 +151,27 @@ const onUploadImg = async (files: File[], callback: (urls: string[]) => void) =>
 
     callback([]);
 };
+const versionDropDown = computed(() => {
+    return [
+        model.value.versions?.map((i) => {
+            return {
+                label: i.version,
+                click() {
+                    useRouter().push(`/edit/version/${props.id}/${i.id}`);
+                },
+            };
+        }),
+    ];
+});
 </script>
 <template>
     <magic-form
+        v-loading="upsertAction.loading"
         :config="configs"
         v-model="model"
         :submit-action="submit"
         :title="isEditMode ? '编辑字体包' : '新增字体包'"
+        :subtitle="isEditMode ? '' : '新增字体后，可以发布版本并上传您的字体文件'"
     >
         <template #custom="{ modelValue, config }">
             <div v-if="config.key === 'markdown'" class="w-full overflow-hidden">
@@ -170,6 +184,17 @@ const onUploadImg = async (files: File[], callback: (urls: string[]) => void) =>
                     />
                 </ClientOnly>
             </div>
+        </template>
+        <template #button>
+            <el-button tag="a" :href="`/edit/version/${model.id}`">新增版本 </el-button>
+            <UDropdown
+                class="ml-4"
+                v-if="versionDropDown[0]"
+                :items="versionDropDown"
+                :popper="{ placement: 'top-start' }"
+            >
+                <el-button>修改版本</el-button>
+            </UDropdown>
         </template>
     </magic-form>
 </template>

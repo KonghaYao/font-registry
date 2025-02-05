@@ -17,9 +17,18 @@
                 <el-button @click="useMagicDialog().toggle('import-from-github-dialog')"> 从 github 导入 </el-button>
             </div>
             <ul class="flex flex-col divide-y">
-                <li :span="24" v-for="item in packages.data" :key="item.id" class="hover:bg-gray-50 flex px-4 py-2">
+                <li
+                    :span="24"
+                    v-for="item in packages.data"
+                    :key="item.id"
+                    class="hover:bg-gray-50 flex px-4 py-2 gap-2"
+                >
                     <a :href="'/packages/' + item.name" class="flex-1 text-gray-700">
                         <span class="font-bold">{{ item.name_cn }}</span>
+                    </a>
+
+                    <a v-if="item.from === 'user_created'" :href="`/edit/packages/${item.id}`">
+                        <el-button type="primary" size="small">修改</el-button>
                     </a>
 
                     <el-button
@@ -46,6 +55,7 @@
                     >
                         重新构建
                     </el-button>
+
                     <el-tag :type="item.is_published ? 'success' : 'danger'">{{
                         item.is_published ? "已发布" : "未发布"
                     }}</el-tag>
@@ -73,7 +83,7 @@ const config = computed(() => [
 const isSuper = useSuperMode();
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    let builder = client.from("packages").select("name_cn,name,id,is_published");
+    let builder = client.from("packages").select("name_cn,name,id,is_published,from");
 
     if (!isSuper.value) builder = builder.eq("user_id", user.value?.id!);
     const { data, error } = await builder;
