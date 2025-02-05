@@ -1,6 +1,6 @@
 import type { Arrayable } from "@vueuse/core";
 import type { FormItemRule } from "element-plus";
-export type UnionConfig = InputConfig | SelectConfig | CustomConfig;
+export type UnionConfig = InputConfig | SelectConfig | CustomConfig | SwitchConfig;
 export interface InputConfig extends BaseConfig {
     type: "input" | "textarea";
     maxlength?: number;
@@ -15,6 +15,7 @@ export interface CustomConfig extends BaseConfig {
     type: "custom";
     key: string;
 }
+export interface SwitchConfig extends BaseConfig {}
 
 export interface BaseConfig {
     label: string;

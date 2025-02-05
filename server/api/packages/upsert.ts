@@ -53,7 +53,7 @@ const api = defineCompose(authLayer, validateJSON(UpsertPackageSchema), async (e
 
         let res = isUpdate
             ? useSupabaseQuery(await builder.update(content).eq("id", data.id!).select())
-            : useSupabaseQuery(await builder.insert(content).select());
+            : useSupabaseQuery(await builder.insert([content]).select());
         resultItem = res.data[0];
     }
 

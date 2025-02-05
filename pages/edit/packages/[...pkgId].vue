@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import "github-markdown-css/github-markdown-light.css";
 definePageMeta({
     layout: "packages",
 });

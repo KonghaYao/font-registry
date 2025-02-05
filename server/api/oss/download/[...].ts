@@ -15,18 +15,7 @@ export default defineCompose(
     },
     cacheLayer(),
     async (event) => {
-        const extra = event.path.split("/source/", 1)[1];
-        const data = await fetch(useRuntimeConfig().NUXT_OSS_ROOT + "/" + extra).then((res) => {
-            if (!res.ok) {
-                return null;
-            }
-            const contentType = res.headers.get("Content-Type");
-            if (contentType) {
-                setResponseHeader(event, "Content-Type", contentType);
-            }
-            return res.blob();
-        });
-        if (!data) throw new NotFoundError();
-        return data;
+        const extra = event.path.split("/download/", 1)[1];
+        return sendRedirect(event, useRuntimeConfig().VITE_CDN_ROOT + "/v2/" + extra);
     }
 );

@@ -79,6 +79,7 @@ const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
                             :value="option.value"
                         />
                     </el-select>
+                    <el-switch v-else-if="isType(item, ['switch'])" v-model="modelValue[item.value]"> </el-switch>
                     <slot
                         v-else-if="isType(item, ['custom'])"
                         v-bind="{
