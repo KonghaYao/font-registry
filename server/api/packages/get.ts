@@ -18,7 +18,7 @@ const api = defineCachedCompose(validateQuery(schema), async (event) => {
     );
     // chain.data
     if (chain.data?.readme && !chain.data.readme.includes(" ")) {
-        chain.data.readme = base64ToUtf8(chain.data.readme);
+        chain.data.readme = base64ToUtf8(chain.data.readme) as string;
         if (chain.data.from === "github_api") {
             chain.data.readme = replaceSrcSetWithAbsoluteUrl(
                 chain.data.readme,

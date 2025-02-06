@@ -15,7 +15,7 @@ export default defineCompose(
     },
     cacheLayer(),
     async (event) => {
-        const extra = event.path.split("/source/", 1)[1];
+        const extra = event.path.split("/source/", 2)[1];
         const data = await fetch(useRuntimeConfig().NUXT_OSS_ROOT + "/" + extra).then((res) => {
             if (!res.ok) {
                 return null;

@@ -42,7 +42,6 @@ const api = defineCompose(authLayer, validateJSON(UpsertPackageSchema), async (e
         }
     );
     if (deleteArray.length) {
-        console.log("deleteArray", deleteArray);
         useSupabaseQuery(
             await client
                 .from("assets")

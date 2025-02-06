@@ -1,7 +1,6 @@
 import { cacheLayer } from "~/server/utils/cache";
 import { useAfterResponse } from "~/server/utils/compose";
 import { getContentType } from "~/server/utils/contentType";
-import { NotFoundError } from "~/server/utils/Errors";
 
 export default defineCompose(
     (event) => {
@@ -15,7 +14,7 @@ export default defineCompose(
     },
     cacheLayer(),
     async (event) => {
-        const extra = event.path.split("/download/", 1)[1];
-        return sendRedirect(event, useRuntimeConfig().VITE_CDN_ROOT + "/v2/" + extra);
+        const extra = event.path.split("/download/", 2)[1];
+        return sendRedirect(event, "https://ik.imagekit.io/basefont/origin/" + extra);
     }
 );
