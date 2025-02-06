@@ -1,16 +1,15 @@
-import z from "zod";
 import { defineCompose } from "../../utils/compose";
-import ImageKit from "imagekit";
+// import ImageKit from "imagekit";
 import { sha256 } from "~/server/utils/sha256";
 
-export const schema = z.object({});
 // 下载 zip 内的文件
 const api = defineCompose(authLayer, async (event) => {
-    const imagekit = new ImageKit({
-        publicKey: process.env.VITE_PK!,
-        privateKey: process.env.VITE_SK!,
-        urlEndpoint: "https://ik.imagekit.io/basefont",
-    });
+    const imagekit = {};
+    // const imagekit = new ImageKit({
+    //     publicKey: process.env.VITE_PK!,
+    //     privateKey: process.env.VITE_SK!,
+    //     urlEndpoint: "https://ik.imagekit.io/basefont",
+    // });
     const data = await readFormData(event);
 
     const file = data.get("file") as File;
