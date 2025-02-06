@@ -37,7 +37,6 @@
         "cn-font-split": "^7.2.1",
         "fast-glob": "^3.3.3",
         "github-markdown-css": "^5.8.1",
-        "happy-dom": "^16.8.1",
         "imagekit": "^6.0.0",
         "jszip": "^3.10.1",
         "md5": "^2.3.0",
