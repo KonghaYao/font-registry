@@ -14,6 +14,7 @@ console.log(pkgKey);
 const urlConfig = reactive({ a: "", img: "" });
 provide("mdc-base-url", urlConfig);
 const { data: pkgDetail } = await useFetch<PackageType.Output>("/api/packages/get?pkgKey=" + pkgKey);
+// console.log(pkgDetail.value);
 if (pkgDetail.value?.from === "github_api") {
     Object.assign(urlConfig, {
         a: "https://github.com/" + pkgKey + "/",

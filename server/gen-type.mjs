@@ -2,7 +2,7 @@ import fs from "fs";
 import ts from "typescript";
 import path from "path";
 import glob from "fast-glob";
-const basePath = path.resolve("./");
+const basePath = path.resolve("./").replace("Users", "users");
 main();
 function main() {
     const program = createProgramWithConfig("./tsconfig.json", []);
@@ -60,6 +60,7 @@ function genServerEndPointType(sourceFile, checker) {
     if (!defaultExportType) {
         return "";
     }
+    // console.log(sourceFile.oa);
     // 构建 .d.ts 内容
     const name = "#server-endpoint/" + path.relative(basePath, sourceFile.path).replaceAll("\\", "/");
     const dtsContent = `

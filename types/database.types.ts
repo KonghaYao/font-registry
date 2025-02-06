@@ -85,7 +85,7 @@ export type Database = {
       }
       packages: {
         Row: {
-          author: number
+          author: number | null
           created_at: string
           description: string | null
           from: string | null
@@ -102,7 +102,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          author: number
+          author?: number | null
           created_at?: string
           description?: string | null
           from?: string | null
@@ -119,7 +119,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          author?: number
+          author?: number | null
           created_at?: string
           description?: string | null
           from?: string | null

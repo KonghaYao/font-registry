@@ -1,7 +1,6 @@
 import { cacheLayer } from "~/server/utils/cache";
 import { useAfterResponse } from "~/server/utils/compose";
 import { getContentType } from "~/server/utils/contentType";
-import { NotFoundError } from "~/server/utils/Errors";
 
 export default defineCompose(
     (event) => {
@@ -15,18 +14,7 @@ export default defineCompose(
     },
     cacheLayer(),
     async (event) => {
-        const extra = event.path.split("/source/", 2)[1];
-        const data = await fetch(useRuntimeConfig().NUXT_OSS_ROOT + "/" + extra).then((res) => {
-            if (!res.ok) {
-                return null;
-            }
-            const contentType = res.headers.get("Content-Type");
-            if (contentType) {
-                setResponseHeader(event, "Content-Type", contentType);
-            }
-            return res.blob();
-        });
-        if (!data) throw new NotFoundError();
-        return data;
+        const extra = event.path.split("/download/", 2)[1];
+        return sendRedirect(event, "https://ik.imagekit.io/basefont/origin/" + extra);
     }
 );

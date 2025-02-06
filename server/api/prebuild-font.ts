@@ -7,6 +7,7 @@ import { authLayer } from "../utils/auth";
 import { useJSON, validateJSON } from "../utils/validation";
 import { NetworkResourceError, NotFoundError, useSupabaseQuery } from "../utils/Errors";
 import { clearCacheLayer } from "../utils/cache";
+import { sha256 } from "../utils/sha256";
 export type InputSchema = z.infer<typeof schema>;
 export const schema = z.object({
     name: z.string(),
@@ -132,17 +133,3 @@ export default defineCompose(
         return { ...style, pkgId: pkg.data.id.toString(), name: body.name };
     }
 );
-async function sha256(message: string) {
-    // 将输入字符串转换为 UTF-8 编码的 Uint8Array
-    const encoder = new TextEncoder();
-    const data = encoder.encode(message);
-
-    // 使用 crypto.subtle 模块来计算 SHA-256 哈希值
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    // 将 ArrayBuffer 转换为十六进制字符串表示形式
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-
-    return hashHex;
-}

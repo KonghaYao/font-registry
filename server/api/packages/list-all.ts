@@ -13,7 +13,7 @@ const api = defineCompose(authLayer, hasRoleLayer(["admin"]), validateQuery(sche
     let chain = client
         .from("packages")
         .select(
-            "name,latest,is_published,keywords,name_cn,created_at,from,style,homepage,description,license,author!inner(*)"
+            "name,latest,is_published,keywords,name_cn,created_at,from,style,homepage,description,license,author!left(*)"
         );
 
     if (data.query)

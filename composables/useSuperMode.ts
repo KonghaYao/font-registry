@@ -1,3 +1,4 @@
+/** 开启超级模式，并可以获取是否开启了超级模式 */
 export const useSuperMode = () => {
     const isSuper = ref(false);
     useLocalStorage("super-mode", isSuper);
