@@ -1,33 +1,12 @@
-// import { z } from "zod";
-// import { Readability } from "@mozilla/readability";
-// import { Window } from "happy-dom";
-// import TurndownService from "turndown";
-// export const schema = z.object({
-//     url: z.string().url(),
-// });
-// export default defineCompose(authLayer, validateJSON(schema), async (event) => {
-//     const json: z.infer<typeof schema> = useJSON(event);
-//     const data = await fetch(json.url).then((res) => res.text());
-//     const htmlText = extractReadableContent(data) ?? data;
-//     const turndownService = new TurndownService({
-//         headingStyle: "atx",
-//         codeBlockStyle: "fenced",
-//     });
-//     const markdown = turndownService.turndown(htmlText);
-//     return markdown;
-// });
+// 转移到 https://github.com/KonghaYao/awesome-deno-deploy-script/blob/main/website-to-md/index.ts
+// netlify edge 和很多 js runtime 对 dom 的支持不太好
 
-// export function extractReadableContent(html: string) {
-//     // 创建一个新的 happy-dom 实例
-//     const window = new Window();
-//     const document = window.document;
-
-//     // 将字符串形式的HTML解析到document对象中
-//     document.write(html);
-//     // 使用 Readability 解析文档
-//     const parser = new Readability(document as any);
-//     const article = parser.parse();
-//     document.close();
-
-//     return article ? article.content : null;
-// }
+export default defineCompose(async (event) => {
+    return fetch("https://website-to-md.deno.dev", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: await readRawBody(event),
+    }).then((res) => res.text());
+});
