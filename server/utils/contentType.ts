@@ -7,7 +7,7 @@ const contentTypeConfig = {
 };
 export const getContentType = (path: string, cb: (ct: string) => void) => {
     for (const ext in contentTypeConfig) {
-        if (path.endsWith(ext)) {
+        if (path.includes(ext)) {
             /**@ts-ignore */
             cb(contentTypeConfig[ext] as string);
             break; // 找到匹配后退出循环
