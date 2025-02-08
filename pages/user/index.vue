@@ -1,5 +1,5 @@
 <template>
-    <div class="my-8 flex flex-col max-w-xl mx-auto border divide-y">
+    <div class="my-8 flex flex-col max-w-3xl mx-auto border divide-y">
         <div class="w-full">
             <div class="hover:bg-gray-50 font-bold text-2xl p-4 pt-8 border-b">用户信息</div>
             <ul class="flex flex-col divide-y">
@@ -27,9 +27,15 @@
                         <span class="font-bold">{{ item.name_cn }}</span>
                     </a>
 
-                    <a v-if="item.from === 'user_created'" :href="`/edit/packages/${item.id}`">
-                        <el-button type="primary" size="small">修改</el-button>
-                    </a>
+                    <el-button
+                        v-if="item.from === 'user_created'"
+                        tag="a"
+                        :href="`/edit/packages/${item.id}`"
+                        type="primary"
+                        size="small"
+                    >
+                        修改
+                    </el-button>
 
                     <el-button
                         size="small"
@@ -59,6 +65,9 @@
                     <el-tag :type="item.is_published ? 'success' : 'danger'">{{
                         item.is_published ? "已发布" : "未发布"
                     }}</el-tag>
+                    <el-button type="danger" size="small" @click="changePublish(item)">
+                        {{ item.is_published ? "撤回" : "发布" }}
+                    </el-button>
                 </li>
             </ul>
         </div>
@@ -69,7 +78,8 @@
 <script setup lang="ts">
 const importDialog = ref();
 const user = useSupabaseUser();
-
+import Prebuild from "#server-endpoint/api/prebuild-font.ts";
+import PublishAction from "#server-endpoint/api/packages/publish.ts";
 const config = computed(() => [
     {
         name: "邮箱",
@@ -98,7 +108,10 @@ const injectAndOpenImport = (data: any) => {
     importDialog.value.model = data;
     useMagicDialog().toggle("import-from-github-dialog");
 };
-const prebuild = useAsyncJSON<{ name: string }, never>(
+
+// ============= 预构建操作 =================
+
+const prebuild = useAsyncJSON<Prebuild.Input, Prebuild.Output>(
     () => ({
         url: "/api/prebuild-font",
         method: "post",
@@ -111,5 +124,31 @@ const prebuild = useAsyncJSON<{ name: string }, never>(
 );
 const rebuildImport = (data: any) => {
     prebuild.fetch(data);
+};
+
+// ============= 发布状态更改 =================
+const publishPackage = useAsyncJSON<PublishAction.Input, PublishAction.Output>(
+    () => ({
+        url: "/api/packages/publish",
+        method: "post",
+    }),
+    {
+        onSuccess(data, input) {
+            ElMessage.success(`操作成功`);
+            packages.fetch(null);
+        },
+    }
+);
+const changePublish = (item: any) => {
+    ElMessageBox.confirm("接下来将更改发布状态，确定进行吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+    }).then(() => {
+        publishPackage.fetch({
+            id: item.id,
+            is_published: !item.is_published,
+        });
+    });
 };
 </script>
