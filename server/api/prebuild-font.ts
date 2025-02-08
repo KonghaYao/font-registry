@@ -48,14 +48,24 @@ export default defineCompose(
         const isAccurate = body.version && body.assets_name;
         // @ts-ignore
         if (!style || style.version !== pkg.data.latest || body.force || isAccurate) {
-            const version = useSupabaseQuery(
-                await client
-                    .from("versions")
-                    .select("*")
-                    .eq("package_id", pkg.data.id)
-                    .eq("version", body.version ?? pkg.data.latest)
-                    .single()
-            );
+            const versionName = body.version ?? pkg.data.latest;
+            const item = versionName
+                ? await client
+                      .from("versions")
+                      .select("*")
+                      .eq("package_id", pkg.data.id)
+                      .eq("version", versionName)
+                      .single()
+                : await client
+                      .from("versions")
+                      .select("*")
+                      .eq("package_id", pkg.data.id)
+                      .order("created_at", {
+                          ascending: false,
+                      })
+                      .limit(1)
+                      .single();
+            const version = useSupabaseQuery(item);
             const chain = client
                 .from("assets")
                 .select("*")
@@ -123,7 +133,13 @@ export default defineCompose(
                 ...reporter.css.toObject(),
             };
             if (!isAccurate)
-                useSupabaseQuery(await client.from("packages").update({ style }).eq("id", pkg.data.id).select());
+                useSupabaseQuery(
+                    await client
+                        .from("packages")
+                        .update({ style, latest: !versionName ? version.data.version || undefined : undefined })
+                        .eq("id", pkg.data.id)
+                        .select()
+                );
 
             useSupabaseQuery(
                 await client.from("assets").update({ is_published: true, style }).eq("id", asset.id).select()

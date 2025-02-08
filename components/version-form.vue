@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Vditor from "./Vditor.vue";
 import Upsert from "#server-endpoint/api/version/upsert.ts";
+import { cloneDeep } from "lodash";
 
 const props = defineProps<{
     pkgId: number;
@@ -47,7 +48,10 @@ const configs: UnionConfig[] = [
         rules: [isRequired],
     },
 ];
-const model = ref({});
+const defaultModel = {
+    isLatest: true,
+};
+const model = ref(cloneDeep(defaultModel));
 const pkgData = ref<any>({});
 
 const upsertAction = useAsyncJSON<Upsert.Input, Upsert.Output>(
@@ -60,7 +64,7 @@ const upsertAction = useAsyncJSON<Upsert.Input, Upsert.Output>(
     {
         onSuccess(data, input) {
             ElMessage.success("更新数据完成");
-            model.value = data.data.version || ({} as any);
+            model.value = data.data.version || (cloneDeep(defaultModel) as any);
             pkgData.value = data.data.package;
             console.log(model.value);
         },

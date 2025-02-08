@@ -52,6 +52,17 @@ const api = defineCompose(authLayer, validateJSON(UpsertPackageSchema), async (e
             ? useSupabaseQuery(await builder.update(content).eq("id", data.id!).select())
             : useSupabaseQuery(await builder.insert([content]).select());
         resultItem = res.data[0];
+        if (content.isLatest) {
+            useSupabaseQuery(
+                await client
+                    .from("packages")
+                    .update({
+                        latest: resultItem.version!,
+                    })
+                    .eq("id", data.package_id)
+                    .single()
+            );
+        }
     }
     return {
         code: 0,
