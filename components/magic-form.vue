@@ -39,12 +39,15 @@ const submitForm = async () => {
     });
 };
 const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
+    /** @ts-ignore */
     return type.includes(value.type!);
 };
 
 const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
     await fn();
 });
+const commonDisable = (config: BaseConfig) =>
+    runAsync.loading || config.disabled?.(props.modelValue[config.value], props.modelValue);
 </script>
 
 <template>
@@ -66,7 +69,7 @@ const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
                         <el-button-group class="float-right">
                             <el-button
                                 v-for="(button, index) in item.buttons"
-                                :disabled="runAsync.loading"
+                                :disabled="commonDisable(item)"
                                 size="small"
                                 @click="runAsync.fetch(async () => button.click?.(modelValue[item.value], modelValue))"
                             >
@@ -83,6 +86,7 @@ const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
                         :placeholder="item.placeholder ?? '请输入' + item.label"
                         @change="item.change?.(modelValue[item.value], modelValue)"
                         :clearable="true"
+                        :disabled="commonDisable(item)"
                     >
                     </el-input>
                     <el-select
@@ -94,6 +98,7 @@ const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
                         :filterable="true"
                         :clearable="true"
                         :allow-create="isType(item, ['tags'] as const)"
+                        :disabled="commonDisable(item)"
                     >
                         <el-option
                             v-for="option in item.options"
@@ -108,6 +113,7 @@ const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
                         v-bind="{
                             modelValue,
                             config: item,
+                            disabled: commonDisable(item),
                         }"
                         name="custom"
                     ></slot>

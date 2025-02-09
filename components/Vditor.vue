@@ -2,39 +2,50 @@
     <div ref="vditorContainer"></div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch } from "vue";
 import "vditor/dist/index.css";
+import Vditor from "vditor";
 // 定义 props 和 emit
 const props = defineProps({
     modelValue: {
         type: String,
         default: "",
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue"]);
 
 // 使用 ref 获取 DOM 元素
-const vditorContainer = ref(null);
-let vditorInstance = null;
+const vditorContainer = ref<HTMLDivElement | null>(null);
+let vditorInstance: Vditor | null = null;
 
 // 在组件挂载后初始化 Vditor
 onMounted(async () => {
     // 确保只在客户端执行
     const { default: Vditor } = await import("vditor");
-    vditorInstance = new Vditor(vditorContainer.value, {
+    vditorInstance = new Vditor(vditorContainer.value!, {
         height: 600,
         toolbarConfig: { pin: true },
         cache: { enable: false },
         after: () => {
-            vditorInstance.setValue(props.modelValue);
+            vditorInstance?.setValue(props.modelValue);
         },
         input: (value) => {
             emit("update:modelValue", value);
         },
     });
 });
+watch(
+    () => props.disabled,
+    (newValue) => {
+        vditorInstance?.[!newValue ? "enable" : "disabled"]();
+    }
+);
 
 // 监听 prop 的变化，并更新 Vditor 的内容
 watch(

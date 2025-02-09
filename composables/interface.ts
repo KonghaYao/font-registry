@@ -1,4 +1,3 @@
-import type { Arrayable } from "@vueuse/core";
 import type { FormItemRule } from "element-plus";
 export type UnionConfig = InputConfig | SelectConfig | CustomConfig | SwitchConfig;
 export interface InputConfig extends BaseConfig {
@@ -27,6 +26,7 @@ export interface BaseConfig {
     /** 纯文本展示转化 */
     display?: (value: string) => string;
     buttons?: Array<ButtonConfig>;
+    disabled?: (value: any, model: any) => boolean;
 }
 
 export interface ButtonConfig {

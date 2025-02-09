@@ -65,7 +65,8 @@ const configs: UnionConfig[] = [
                             article: readme,
                         },
                         (info) => {
-                            model.value.description += info.choices[0]?.delta?.content;
+                            const content = info.choices[0]?.delta?.content;
+                            if (content) model.value.description += content;
                         }
                     );
                 },
@@ -203,10 +204,11 @@ const versionDropDown = computed(() => {
         :title="isEditMode ? '编辑字体包' : '新增字体包'"
         :subtitle="isEditMode ? '' : '新增字体后，可以发布版本并上传您的字体文件'"
     >
-        <template #custom="{ modelValue, config }">
+        <template #custom="{ modelValue, config, disabled }">
             <div v-if="config.key === 'markdown'" class="w-full overflow-hidden">
                 <ClientOnly>
                     <Vditor
+                        :disabled="disabled"
                         v-model="modelValue[config.value]"
                         @onUploadImg="onUploadImg"
                         :no-katex="true"

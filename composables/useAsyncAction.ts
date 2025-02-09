@@ -142,7 +142,6 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                         events?.onSuccess?.(finalData, input);
                         return;
                     }
-                    console.log(msg.data);
                     if (msg.data === "[DONE]") {
                         res(null as any);
                         events?.onSuccess?.(null as any, input);
