@@ -4,7 +4,6 @@ export type UnionConfig = InputConfig | SelectConfig | CustomConfig | SwitchConf
 export interface InputConfig extends BaseConfig {
     type: "input" | "textarea";
     maxlength?: number;
-    buttonClick?: (value: string, model: any) => Promise<void> | void;
 }
 export interface SelectConfig extends BaseConfig {
     type: "select" | "tags";
@@ -27,4 +26,10 @@ export interface BaseConfig {
     change?: (value: string, formValue: any) => void;
     /** 纯文本展示转化 */
     display?: (value: string) => string;
+    buttons?: Array<ButtonConfig>;
+}
+
+export interface ButtonConfig {
+    label?: string;
+    click?: (value: string, model: any) => Promise<void> | void;
 }

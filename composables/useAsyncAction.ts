@@ -96,6 +96,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
     fn: (input: Input) => {
         url: string;
         method?: "get" | "post";
+        headers?: Record<string, string>;
         body?: Input;
     },
     events?: AsyncEvent<Input, Output, Message>
@@ -114,6 +115,7 @@ export function useAsyncSSEJSON<Input, Output, Message>(
             fetchEventSource(data.url, {
                 method: data.method,
                 headers: {
+                    ...(data.headers ?? {}),
                     "Content-Type": data.method === "post" ? "application/json" : "",
                 },
                 openWhenHidden: true,
@@ -138,6 +140,12 @@ export function useAsyncSSEJSON<Input, Output, Message>(
                         const finalData = JSON.parse(msg.data);
                         res(finalData);
                         events?.onSuccess?.(finalData, input);
+                        return;
+                    }
+                    console.log(msg.data);
+                    if (msg.data === "[DONE]") {
+                        res(null as any);
+                        events?.onSuccess?.(null as any, input);
                         return;
                     }
                     const message = JSON.parse(msg.data) as Message;

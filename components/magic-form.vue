@@ -41,15 +41,39 @@ const submitForm = async () => {
 const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
     return type.includes(value.type!);
 };
+
+const runAsync = useAsyncAction<() => Promise<any>, any, any>(async (fn) => {
+    await fn();
+});
 </script>
 
 <template>
-    <el-form ref="formEl" label-position="top" :model="modelValue" :label-width="maxLabelWidth" class="px-4 py-2">
+    <el-form
+        ref="formEl"
+        label-position="top"
+        :model="modelValue"
+        :label-width="maxLabelWidth"
+        class="magic-form px-4 py-2"
+    >
         <h3 class="text-center mt-2 mb-4 text-xl font-bold" v-if="title">{{ title }}</h3>
         <h4 class="text-center mt-2 mb-4 text-gray-500" v-if="subtitle">{{ subtitle }}</h4>
         <el-row :gutter="16">
             <el-col :span="item.span ?? 24" v-for="item in config" :key="item.value">
                 <el-form-item :prop="item.value" :label="item.label" :rules="item.rules">
+                    <template #label="{ label }">
+                        <span>{{ label }}</span>
+
+                        <el-button-group class="float-right">
+                            <el-button
+                                v-for="(button, index) in item.buttons"
+                                :disabled="runAsync.loading"
+                                size="small"
+                                @click="runAsync.fetch(async () => button.click?.(modelValue[item.value], modelValue))"
+                            >
+                                {{ button.label ?? "确认" }}
+                            </el-button>
+                        </el-button-group>
+                    </template>
                     <el-input
                         v-if="isType(item, ['input', 'textarea'] as const)"
                         v-model="modelValue[item.value]"
@@ -60,9 +84,6 @@ const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
                         @change="item.change?.(modelValue[item.value], modelValue)"
                         :clearable="true"
                     >
-                        <template #append v-if="item.buttonClick">
-                            <el-button @click="item.buttonClick?.(modelValue[item.value], modelValue)">确认</el-button>
-                        </template>
                     </el-input>
                     <el-select
                         v-else-if="isType(item, ['select','tags'] as const)"
@@ -108,5 +129,8 @@ const isType = <T extends BaseConfig, D = T["type"]>(value: T, type: D[]) => {
 svg.md-editor-icon {
     width: 1.5rem;
     height: 1.5rem;
+}
+.magic-form .el-form-item__label {
+    width: 100%;
 }
 </style>

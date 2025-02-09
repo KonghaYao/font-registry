@@ -46,6 +46,31 @@ const configs: UnionConfig[] = [
         placeholder: "字体的描述信息",
         maxlength: 200,
         rules: [isRequired],
+        buttons: [
+            {
+                label: "从文章生成",
+                async click(value: string) {
+                    const readme = model.value.readme ?? "";
+                    // 字数限制
+                    if (readme.length <= 200) {
+                        ElMessage.warning("请输入超过 200 字的主页详细文章");
+                        return;
+                    }
+
+                    ElMessage.info("AI 思考中。。。");
+                    model.value.description = "";
+                    return useAI(
+                        "article/summary",
+                        {
+                            article: readme,
+                        },
+                        (info) => {
+                            model.value.description += info.choices[0]?.delta?.content;
+                        }
+                    );
+                },
+            },
+        ],
     },
     {
         label: "官方地址",
@@ -79,34 +104,39 @@ const configs: UnionConfig[] = [
         value: "import_article",
         type: "input",
         placeholder: "可以输入一个网站，然后进行导入，这样就不用自己写了",
-        buttonClick: async (value: string, model: any) => {
-            if (!value || !value.startsWith("http")) {
-                ElMessage.warning("请输入一个网站地址");
-                return;
-            }
-            ElMessage.info("导入中。。。");
-            return fetch("/api/system/website-to-md", {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
+        buttons: [
+            {
+                label: "导入",
+                async click(value: string, model: any) {
+                    if (!value || !value.startsWith("http")) {
+                        ElMessage.warning("请输入一个网站地址");
+                        return;
+                    }
+                    ElMessage.info("导入中。。。");
+                    return fetch("/api/system/website-to-md", {
+                        method: "post",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            url: value,
+                        }),
+                    })
+                        .then((res) => {
+                            if (res.ok) return res.text();
+                            throw new Error("请求失败");
+                        })
+                        .then((res) => {
+                            model.readme = res;
+                            ElMessage.success("导入成功");
+                        })
+                        .catch((e) => {
+                            console.error(e);
+                            ElMessage.error("导入失败");
+                        });
                 },
-                body: JSON.stringify({
-                    url: value,
-                }),
-            })
-                .then((res) => {
-                    if (res.ok) return res.text();
-                    throw new Error("请求失败");
-                })
-                .then((res) => {
-                    model.readme = res;
-                    ElMessage.success("导入成功");
-                })
-                .catch((e) => {
-                    console.error(e);
-                    ElMessage.error("导入失败");
-                });
-        },
+            },
+        ],
     },
     {
         label: "主页详细文章",
@@ -116,7 +146,7 @@ const configs: UnionConfig[] = [
         rules: [isRequired],
     },
 ];
-const model = ref({
+const model = ref<any>({
     // id: 69,
     // // 测试数据
     // name_cn: "测试字体",

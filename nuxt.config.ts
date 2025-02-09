@@ -16,6 +16,7 @@ export default defineNuxtConfig({
         VITE_SK: process.env.VITE_SK,
         VITE_PK: process.env.VITE_PK,
         NUXT_ZIP_SERVER: process.env.NUXT_ZIP_SERVER,
+        NUXT_AI_TOKEN: process.env.NUXT_AI_TOKEN,
     },
     components: [
         {

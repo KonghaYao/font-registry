@@ -63,6 +63,13 @@ export class VoidError extends CustomError {
     }
 }
 
+export class RemoteRequestError extends CustomError {
+    constructor(res: Response, data?: any) {
+        super("RemoteRequestError", 412, res.status + " " + res.statusText, true);
+        this.setDebugMessage(data);
+    }
+}
+
 export class NotFoundError extends CustomError {
     constructor(description = "Resource not found") {
         super("NotFoundError", 404, description, true);
