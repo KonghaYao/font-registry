@@ -18,7 +18,14 @@ export default defineCompose(authLayer, async (event) => {
     if (!data.ok) {
         throw new RemoteRequestError(data, await data.text());
     }
-    return sendWebResponse(event, new Response(data.body));
+    return sendWebResponse(
+        event,
+        new Response(data.body, {
+            headers: {
+                "Content-Type": data.headers.get("Content-Type")!,
+            },
+        })
+    );
 });
 // 定义encryptToken函数
 const encryptToken = (token: string, timespace = 60 * 1000) => {
