@@ -28,7 +28,7 @@
                     </a>
 
                     <el-button
-                        v-if="item.from === 'user_created'"
+                        v-if="item.from === 'user_created' || isSuper"
                         tag="a"
                         :href="`/edit/packages/${item.id}`"
                         type="primary"

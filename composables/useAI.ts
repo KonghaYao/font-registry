@@ -15,6 +15,23 @@ export const useAI = <Input>(path: string, input: Input, cb: (data: ChatCompleti
     );
     return action.fetch(input);
 };
+export const useAIJSON = <Input>(path: string, input: Input, cb: (data: ChatCompletionChunk) => void) => {
+    const action = useAsyncJSON<Input, ChatCompletionChunk, void>(
+        async (input) => {
+            return {
+                url: `/api/ai/${path}`,
+                method: "post",
+                body: input,
+            };
+        },
+        {
+            onSuccess(data, input) {
+                cb(data);
+            },
+        }
+    );
+    return action.fetch(input);
+};
 
 // 转成类型
 interface ChatCompletionChunk {

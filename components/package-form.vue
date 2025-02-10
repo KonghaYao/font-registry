@@ -2,6 +2,7 @@
 import { ValidURL } from "../composables/useRules";
 import Vditor from "./Vditor.vue";
 import Upsert from "#server-endpoint/api/packages/upsert.ts";
+import { useAIJSON } from "~/composables/useAI";
 
 const props = defineProps<{
     id?: number;
@@ -99,6 +100,32 @@ const configs: UnionConfig[] = [
         type: "tags",
         placeholder: "便于字友搜索得到的关键字",
         rules: [isRequired],
+        buttons: [
+            {
+                label: "从文章中总结",
+                click: () => {
+                    const readme = model.value.readme ?? "";
+                    // 字数限制
+                    if (readme.length <= 200) {
+                        ElMessage.warning("请输入超过 200 字的主页详细文章");
+                        return;
+                    }
+                    return useAIJSON(
+                        "article/create-tag",
+                        {
+                            article: readme,
+                            tagLength: 10,
+                        },
+                        (info) => {
+                            console.log(info);
+                            /** @ts-ignore */
+                            const content = info.choices[0]?.message?.content;
+                            if (content) model.value.keywords = JSON.parse(content).tags;
+                        }
+                    );
+                },
+            },
+        ],
     },
     {
         label: "从网站导入文章",
