@@ -245,7 +245,7 @@ const versionDropDown = computed(() => {
             </div>
         </template>
         <template #button>
-            <el-button v-if="id" tag="a" :href="`/edit/version/${model.id}`">新增版本 </el-button>
+            <el-button v-if="model.id" tag="a" :href="`/edit/version/${model.id}`">新增版本 </el-button>
             <UDropdown
                 class="ml-4"
                 v-if="versionDropDown[0]"
