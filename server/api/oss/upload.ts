@@ -17,7 +17,7 @@ const api = defineCompose(authLayer, async (event) => {
     const binary = new Uint8Array(await file.arrayBuffer());
     const sha = await sha256(binary);
     await imagekit.upload({
-        file: Buffer.copyBytesFrom(binary),
+        file: Buffer.from(binary),
         fileName: name,
         folder: `/origin/${sha}`,
         useUniqueFileName: false,
