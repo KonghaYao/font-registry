@@ -1,6 +1,7 @@
 import { cacheLayer } from "~/server/utils/cache";
 import { useAfterResponse } from "~/server/utils/compose";
 import { getContentType } from "~/server/utils/contentType";
+import { s3Client } from "~/server/utils/s3Client";
 
 export default defineCompose(
     (event) => {
@@ -15,6 +16,7 @@ export default defineCompose(
     cacheLayer(),
     async (event) => {
         const extra = event.path.split("/download/", 2)[1];
-        return sendRedirect(event, "https://ik.imagekit.io/basefont/origin/" + extra);
+        const res = await s3Client.getObject("chinese-fonts", `origin/${decodeURIComponent(extra)}`);
+        return res;
     }
 );

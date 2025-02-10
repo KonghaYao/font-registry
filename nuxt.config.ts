@@ -1,4 +1,3 @@
-import netlifyBlobsDriver from "unstorage/drivers/netlify-blobs";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: "2024-11-01",
@@ -17,6 +16,10 @@ export default defineNuxtConfig({
         VITE_PK: process.env.VITE_PK,
         NUXT_ZIP_SERVER: process.env.NUXT_ZIP_SERVER,
         NUXT_AI_TOKEN: process.env.NUXT_AI_TOKEN,
+        NUXT_S3_REGION: process.env.NUXT_S3_REGION,
+        NUXT_S3_ENDPOINT: process.env.NUXT_S3_ENDPOINT,
+        NUXT_S3_AK: process.env.NUXT_S3_AK,
+        NUXT_S3_SK: process.env.NUXT_S3_SK,
     },
     components: [
         {

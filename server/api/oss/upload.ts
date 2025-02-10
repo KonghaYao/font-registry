@@ -1,12 +1,6 @@
 import { defineCompose } from "../../utils/compose";
-import ImageKit from "imagekit";
 import { sha256 } from "~/server/utils/sha256";
-
-const imagekit = new ImageKit({
-    publicKey: useRuntimeConfig().VITE_PK!,
-    privateKey: useRuntimeConfig().VITE_SK!,
-    urlEndpoint: "https://ik.imagekit.io/basefont",
-});
+import { s3Client } from "../../utils/s3Client";
 
 // 下载 zip 内的文件
 const api = defineCompose(authLayer, async (event) => {
@@ -16,12 +10,8 @@ const api = defineCompose(authLayer, async (event) => {
     const name = data.get("name") as string;
     const binary = new Uint8Array(await file.arrayBuffer());
     const sha = await sha256(binary);
-    await imagekit.upload({
-        file: Buffer.from(binary),
-        fileName: name,
-        folder: `/origin/${sha}`,
-        useUniqueFileName: false,
-    });
+
+    await s3Client.putObject("chinese-fonts", `origin/${sha}/${name}`, Buffer.from(binary));
     return {
         status: "success",
         message: "File uploaded successfully.",
