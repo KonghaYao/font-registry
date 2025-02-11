@@ -30,7 +30,24 @@ export default defineNuxtConfig({
     nitro: {
         minify: false,
         unenv: {
+            alias: {
+                "readable-stream": "stream",
+            },
             external: [
+                "events",
+                "node:events",
+                "stream/web",
+                "node:stream/web",
+                "stream/promises",
+                "node:stream/promises",
+                "stream/consumers",
+                "node:stream/consumers",
+                "_stream_duplex",
+                "_stream_passthrough",
+                "_stream_readable",
+                "_stream_transform",
+                "_stream_wrap",
+                "_stream_writable",
                 "stream",
                 "node:stream",
                 "http",
