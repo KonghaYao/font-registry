@@ -28,6 +28,23 @@ export default defineNuxtConfig({
         },
     ],
     nitro: {
+        minify: false,
+        unenv: {
+            external: [
+                "stream",
+                "node:stream",
+                "http",
+                "https",
+                "node:http",
+                "node:https",
+                "crypto",
+                "node:crypto",
+                "fs",
+                "fs/promises",
+                "node:fs",
+                "node:fs/promises",
+            ],
+        },
         storage: {
             cache: {
                 name: "server-cache",
