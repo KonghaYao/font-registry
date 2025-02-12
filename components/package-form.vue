@@ -36,7 +36,7 @@ const configs: UnionConfig[] = [
         value: "name",
         type: "input",
         placeholder: "作者名/字体名, 如 KonghaYao/cn-font-split",
-        maxlength: 20,
+        maxlength: 40,
         rules: [isRequired, IDValidate],
         span: 12,
     },
