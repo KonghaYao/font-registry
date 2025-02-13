@@ -24,7 +24,7 @@ const uppy = new Uppy({
 });
 uppy.setOptions({
     restrictions: {
-        maxFileSize: 1024 * 1024 * 50,
+        maxFileSize: 1024 * 1024 * 80,
         minNumberOfFiles: 1,
         allowedFileTypes: [".ttf", ".otf"],
     },
