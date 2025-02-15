@@ -93,7 +93,9 @@ const config = computed(() => [
 const isSuper = useSuperMode();
 const client = useSupabaseClient();
 const packages = useAsyncAction(async () => {
-    let builder = client.from("packages").select("name_cn,name,id,is_published,from");
+    let builder = client.from("packages").select("name_cn,name,id,is_published,from").order("created_at", {
+        ascending: false,
+    });
 
     if (!isSuper.value) builder = builder.eq("user_id", user.value?.id!);
     const { data, error } = await builder;

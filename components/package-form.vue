@@ -120,7 +120,10 @@ const configs: UnionConfig[] = [
                             console.log(info);
                             /** @ts-ignore */
                             const content = info.choices[0]?.message?.content;
-                            if (content) model.value.keywords = JSON.parse(content).tags;
+                            if (content) {
+                                const c = JSON.parse(content);
+                                model.value.keywords = c.tags || c.content;
+                            }
                         }
                     );
                 },
