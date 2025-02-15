@@ -37,7 +37,7 @@ const configs: UnionConfig[] = [
         label: "是否最新版本",
         value: "isLatest",
         type: "switch",
-        rules: [isRequired],
+        rules: [],
         span: 12,
     },
     {

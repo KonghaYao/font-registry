@@ -25,7 +25,7 @@ export const IDValidate: FormItemRule = {
             return cb();
         }
         if (!isValidGithubRepo(value)) {
-            return cb("ID 格式为 username/repo，username 不能包含特殊字符，repo 不能以 . 或 - 开头或结尾");
+            return cb("ID 格式为 username/repo, 英文或数字");
         }
         return cb();
     },
