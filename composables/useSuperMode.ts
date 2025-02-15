@@ -4,7 +4,7 @@ export const useSuperMode = () => {
     useLocalStorage("super-mode", isSuper);
 
     const keys = useMagicKeys();
-    const Key = keys["Alt+Ctrl+A"];
+    const Key = keys["Shift+Ctrl+A"];
     watch(Key, (v) => {
         if (v) {
             isSuper.value = !isSuper.value;
