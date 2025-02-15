@@ -32,7 +32,7 @@ const api = defineCompose(authLayer, validateJSON(UpsertPackageSchema), async (e
             resultItem = useSupabaseQuery(
                 await client
                     .from("versions")
-                    .select("*,assets!left(*)")
+                    .select("*,assets!assets_package_id_fkey(*)")
                     .eq("id", data.id)
                     .eq("package_id", data.package_id)
                     .single()
