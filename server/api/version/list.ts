@@ -12,7 +12,7 @@ export const getVersionFromPackage = defineCachedFunction(
         const client = serverSupabaseServiceRole(event);
         let chain = client
             .from("versions")
-            .select("created_at,version,assets!inner(*)")
+            .select("created_at,version,assets!assets_package_id_fkey(*)")
             .eq("package_id", parseInt(pkgId))
             .order("created_at", {
                 ascending: false,
@@ -22,8 +22,8 @@ export const getVersionFromPackage = defineCachedFunction(
     },
     {
         maxAge: 10 * 60,
-        getKey(event, pkgId) {
-            return "version:" + pkgId;
+        getKey: (event: H3Event) => {
+            return encodeKey(event.node.req.url);
         },
     }
 );

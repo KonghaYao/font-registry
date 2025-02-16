@@ -5,8 +5,9 @@ import type PreBuild from "#server-endpoint/api/prebuild-font.ts";
 const props = defineProps<{
     pkgId: number;
     pkgName: string;
+    can_download: boolean;
 }>();
-
+const isSuper = useSuperMode();
 const prebuild = useAsyncJSON<PreBuild.Input, PreBuild.Output>(
     () => ({
         url: "/api/prebuild-font",
@@ -76,7 +77,12 @@ defineExpose({
                             {{ prettyBytes(asset.size) }}
                         </span>
                     </span>
-                    <a target="_blank" :href="asset.download_url" class="text-primary-500 flex-none">
+                    <a
+                        target="_blank"
+                        v-if="isSuper || can_download"
+                        :href="asset.download_url"
+                        class="text-primary-500 flex-none"
+                    >
                         <UIcon name="icon-park-outline:download-one" class="w-5 h-5" />
                         <span> 下载文件 </span>
                     </a>

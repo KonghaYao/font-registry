@@ -70,7 +70,12 @@ useHead({
                     :value="pkgDetail?.readme || ''"
                     tag="article"
                 />
-                <version-panel v-if="item.label === '版本'" :pkg-id="pkgDetail?.id!" :pkg-name="pkgDetail?.name!">
+                <version-panel
+                    v-if="item.label === '版本'"
+                    :pkg-id="pkgDetail?.id!"
+                    :pkg-name="pkgDetail?.name!"
+                    :can_download="pkgDetail?.can_download!"
+                >
                 </version-panel>
             </template>
         </UTabs>
