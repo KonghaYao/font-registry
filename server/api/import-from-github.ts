@@ -119,8 +119,20 @@ export default defineCompose(
             const release = response.data[index];
             let zipFiles: any[] = [];
             let assetIds = release.assets.filter((i) => {
-                if (i.content_type === "application/zip" || i.name.endsWith(".zip") || i.name.endsWith(".7z"))
-                    zipFiles.push(i);
+                if (i.content_type === "application/zip" || i.name.endsWith(".zip") || i.name.endsWith(".7z")) {
+                    const lowCaseName = i.name.toLowerCase();
+                    if (["woff2", "unhinted"].some((d) => lowCaseName.includes(d))) return;
+                    if (
+                        lowCaseName.includes("ttf") &&
+                        release.assets.some((asset) => asset.name.toLowerCase() === lowCaseName.replace("ttf", "otf"))
+                    )
+                        return;
+                    if (i.size > 100 * 1024 * 1024) {
+                        console.error("zip 体积超过 100MB ", i.name);
+                        return false;
+                    }
+                    return zipFiles.push(i);
+                }
                 return (
                     i.state === "uploaded" &&
                     (i.content_type.startsWith("font/") || ["otf", "ttf"].some((ext) => i.name.endsWith(ext)))
