@@ -54,8 +54,13 @@ useHead({
         }"
     >
         <div class="my-6 p-4 border">
-            <div class="text-2xl font-bold leading-tight text-gray-900 flex items-center mb-2">
+            <div class="font-bold leading-tight text-gray-500 flex items-center mb-2">
                 <package-name :name="pkgDetail?.name!" :name_cn="pkgDetail?.name_cn!"></package-name>
+                <div class="flex-1"></div>
+                <span class="flex gap-2">
+                    <span>{{ fontInfoOfStyle?.family }}</span>
+                    <span>{{ fontInfoOfStyle?.weight }}</span>
+                </span>
             </div>
             <div class="mb-4">
                 {{ pkgDetail?.description }}

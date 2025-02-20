@@ -35,7 +35,7 @@ const getPreviewLink = (pkgName: string, style: any) => {
                 </div>
             </header>
             <div class="text-gray-600 mb-3 flex flex-nowrap">
-                <div class="flex-1 line-clamp-3 text-sm">
+                <div class="flex-1 max-h-[3.8rem] line-clamp-3 text-sm overflow-hidden text-ellipsis">
                     {{ pack.description }}
                 </div>
                 <div class="flex-1 block place-content-center" v-if="pack.style">
@@ -47,8 +47,8 @@ const getPreviewLink = (pkgName: string, style: any) => {
                 </div>
             </div>
             <footer class="flex-col -m-2 justify-between text-sm">
-                <div class="p-2 w-full md:w-1/2 lg:w-1/3">
-                    <ul class="flex gap-2">
+                <div class="p-2 w-full">
+                    <ul class="flex gap-2 flex-wrap">
                         <el-tag v-for="tag in pack.keywords" :key="tag" size="small">
                             {{ tag }}
                         </el-tag>

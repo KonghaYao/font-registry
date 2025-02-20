@@ -38,6 +38,7 @@
                     </el-button>
 
                     <el-button
+                        v-if="item.from === 'github_api'"
                         size="small"
                         @click="
                             injectAndOpenImport({
